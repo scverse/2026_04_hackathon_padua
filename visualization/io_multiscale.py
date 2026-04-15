@@ -1,7 +1,77 @@
+import pandas as pd
+import numpy as np
 import pyarrow as pa
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
 import json
+from dask.dataframe import DataFrame as DaskDataFrame
+from indexing import GridLevel
+
+def build_metadata(
+    *,
+    points: DaskDataFrame | pd.DataFrame,
+    grid: dict[int, GridLevel],
+    axes: tuple[str, ...] = ("x", "y", "z"),
+    coordinate_space: str = "raw",
+    version: str = "1.0",
+    format_name: str = "spatialdata_multiscale_points",
+    morton_bits_per_axis: int | None = None,
+) -> dict:
+    """Build footer metadata for multiscale points parquet files.
+
+    The output dict is intended to be serialized as JSON under the
+    ``spatialdata_multiscale`` parquet key.
+    """
+    if isinstance(points, DaskDataFrame):
+        points = points.compute()
+
+    if not grid:
+        raise ValueError("Cannot build metadata from an empty grid.")
+
+    missing_axes = [axis for axis in axes if axis not in points.columns]
+    if missing_axes:
+        raise ValueError(
+            "Points table is missing required axis columns: " + ", ".join(missing_axes)
+        )
+
+    mins_series = points.loc[:, list(axes)].min(axis=0)
+    maxs_series = points.loc[:, list(axes)].max(axis=0)
+    bbox_min = [float(v) for v in mins_series.to_list()]
+    bbox_max = [float(v) for v in maxs_series.to_list()]
+
+    levels: list[dict] = []
+    max_grid_dim = 1
+    for level in sorted(grid.keys()):
+        level_obj = grid[level]
+        grid_shape_list = [int(v) for v in level_obj.grid_shape]
+        cell_size_list = [float(v) for v in level_obj.chunk_size]
+        levels.append(
+            {
+                "level": int(level),
+                "grid_shape": grid_shape_list,
+                "cell_size": cell_size_list,
+            }
+        )
+        if grid_shape_list:
+            max_grid_dim = max(max_grid_dim, max(grid_shape_list))
+
+    if morton_bits_per_axis is None:
+        morton_bits_per_axis = int(np.ceil(np.log2(max_grid_dim)))
+
+    return {
+        "version": version,
+        "format": format_name,
+        "axes": list(axes),
+        "bounding_box": {
+            "min": bbox_min,
+            "max": bbox_max,
+        },
+        "coordinate_space": coordinate_space,
+        "limit": int(next(iter(grid.values())).limit),
+        "levels": levels,
+        "n_points_total": int(len(points)),
+        "morton_bits_per_axis": int(morton_bits_per_axis),
+    }
 
 def _write(
     table: pa.Table,
@@ -59,7 +129,7 @@ def _row_group_ranges_from_arrow_table(table: pa.Table):
 
     return list(zip(starts, ends))
 
-def save_multiscale_points(df, path):
+def save_multiscale_points(df, metadata, path):
     # Avoid pyarrow warning when DataFrame.attrs contains non-JSON objects.
     if getattr(df, "attrs", None):
         df = df.copy()
@@ -68,7 +138,7 @@ def save_multiscale_points(df, path):
     table = pa.Table.from_pandas(df, preserve_index=False)
     indices = pc.sort_indices(table, sort_keys=[("gene", "ascending"),
                                                 ("__spatial_index__", "ascending"),
-                                                ("__chunk_key__", "ascending")])
+                                                ("__morton__", "ascending")])
     table = table.take(indices)
 
     row_group_ranges = _row_group_ranges_from_arrow_table(table)
@@ -77,6 +147,7 @@ def save_multiscale_points(df, path):
         table,
         row_group_ranges=row_group_ranges,
         output_path=path,
+        metadata=metadata
     )
 
 
