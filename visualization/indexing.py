@@ -225,15 +225,15 @@ def compute_spatial_index(
                 & (filtered[:, 2] <= centroid[2] + half[2] + eps)
             )
             discarded = np.sum(~mask).item()
-            if discarded > 0:
-                # TODO: **possible bug!** This message is not printed while I would
-                #  expect that the kDTree query would sometimes return more points than
-                #  the mask would allow (this should happen when chunk_size has
-                #  different dimensions)
-                logger.warning(
-                    f"{discarded} points were filtered out of {len(indices)} "
-                    f"during spatial index computation"
-                )
+            # if discarded > 0:
+            #     # TODO: **possible bug!** This message is not printed while I would
+            #     #  expect that the kDTree query would sometimes return more points than
+            #     #  the mask would allow (this should happen when chunk_size has
+            #     #  different dimensions)
+            #     logger.warning(
+            #         f"{discarded} points were filtered out of {len(indices)} "
+            #         f"during spatial index computation"
+            #     )
             indices = np.array(indices)[mask].tolist()
 
             # filter out points that have been previously emitted
