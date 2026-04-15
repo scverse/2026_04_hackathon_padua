@@ -383,3 +383,21 @@ def grid_to_spatial_index_dataframe(
     output["__spatial_index__"] = assignments_df["__spatial_index__"].to_numpy()
     output["__chunk_key__"] = assignments_df["__chunk_key__"].to_numpy()
     return output
+
+def add_morton_from_chunk_key(df, key_col="__chunk_key__", bits_per_axis=None):
+    coords = df[key_col].str.split("_", expand=True).astype(np.uint32)
+    x = coords[0].to_numpy(np.uint32)
+    y = coords[1].to_numpy(np.uint32)
+    z = coords[2].to_numpy(np.uint32)
+
+    if bits_per_axis is None:
+        max_coord = int(max(x.max(initial=0), y.max(initial=0), z.max(initial=0)))
+        bits_per_axis = max(1, int(np.ceil(np.log2(max_coord + 1))))
+
+    morton = np.zeros(len(df), dtype=np.uint64)
+    for b in range(bits_per_axis):
+        morton |= ((x >> b).astype(np.uint64) & 1) << (3 * b)
+        morton |= ((y >> b).astype(np.uint64) & 1) << (3 * b + 1)
+        morton |= ((z >> b).astype(np.uint64) & 1) << (3 * b + 2)
+
+    df["__morton__"] = morton
