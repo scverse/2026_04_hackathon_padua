@@ -16,7 +16,7 @@ import random
 import os
 import pyarrow.parquet as pq
 
-from indexing import get_coordinates_and_kd_tree, compute_spatial_index, grid_to_spatial_index_dataframe, add_morton_from_chunk_key
+from indexing import compute_spatial_index, grid_to_spatial_index_dataframe, add_morton_from_chunk_key
 from io_multiscale import build_metadata, save_multiscale_points, query
 
 def _generate_point_daskdf(n: int, n_genes: int = 1, seed: int = 42) -> DaskDataFrame:
@@ -70,8 +70,7 @@ def _benchmark_polars_gene_query(path: Path, gene: str = "gene_0") -> float:
 
 def _benchmark_multiscale_writing(path: Path, points: DaskDataFrame) -> float:
     start = time.perf_counter()
-    xyz, kdtree = get_coordinates_and_kd_tree(points)
-    grid = compute_spatial_index(xyz, kdtree)
+    grid = compute_spatial_index(points)
     meta = build_metadata(points=points, grid=grid)
     df = grid_to_spatial_index_dataframe(points=points, grid=grid)
     add_morton_from_chunk_key(df)
