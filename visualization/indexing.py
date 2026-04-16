@@ -117,36 +117,54 @@ class GridLevel:
                 next_grid_shape[i] *= 2
         return tuple(next_grid_shape)
 
+## VIBECODED. ToDo: check if this is correct
+def _get_cell_indices_for_level(
+    xyz: ValidNumericNDArray,
+    remaining_indices: set[int],
+    grid_level: GridLevel,
+) -> dict[tuple[int, ...], list[int]]:
+    """Assign remaining points to active cells using floor division."""
+    if not remaining_indices or not grid_level.cells:
+        return {}
 
-def get_coordinates_and_kd_tree(
-    points: pd.DataFrame | DaskDataFrame,
-) -> tuple[ValidNumericNDArray, KDTree]:
-    """
-    Extract xyz coordinates and create a KDTree.
-    """
-    # TODO: we can generalize to 2D points. 1D points do not make much sense. If we
-    #  only have 1D or 2D point the following line will throw an error.
-    if isinstance(points, DaskDataFrame):
-        xyz = points[["x", "y", "z"]].compute().values
-    else:
-        xyz = points[["x", "y", "z"]].values
-    dtype = xyz.dtype
-    if not (
-        dtype in SUPPORTED_DTYPES
-        and (np.issubdtype(dtype, np.integer) or np.issubdtype(dtype, np.floating))
-    ):
-        # TODO: make a test for this
-        raise TypeError(
-            f"Unsupported type for xyz coordinates: {type(xyz).__name__}. Supported "
-            f"types are numerical types from: {SUPPORTED_DTYPES}."
-        )
-    kd_tree = KDTree(xyz)
-    return xyz, kd_tree
+    remaining_idx_array = np.array(sorted(remaining_indices), dtype=np.int64)
+    remaining_xyz = xyz[remaining_idx_array]
+    mins = np.asarray(grid_level.mins, dtype=np.float64)
+    chunk_size = np.asarray(grid_level.chunk_size, dtype=np.float64)
+    grid_shape = np.asarray(grid_level.grid_shape, dtype=np.int64)
 
+    varying_dims = (chunk_size > 0) & (grid_shape > 1)
+    safe_chunk_size = np.where(varying_dims, chunk_size, 1.0)
+
+    cell_coords = np.floor((remaining_xyz - mins) / safe_chunk_size).astype(np.int64)
+    cell_coords[:, ~varying_dims] = 0
+    np.clip(cell_coords, 0, grid_shape - 1, out=cell_coords)
+
+    encoded_cells = np.ravel_multi_index(cell_coords.T, tuple(grid_shape))
+    active_cells = np.asarray(grid_level.cells, dtype=np.int64)
+    encoded_active_cells = np.ravel_multi_index(active_cells.T, tuple(grid_shape))
+    active_mask = np.isin(encoded_cells, encoded_active_cells)
+    if not np.any(active_mask):
+        return {}
+
+    encoded_cells = encoded_cells[active_mask]
+    remaining_idx_array = remaining_idx_array[active_mask]
+
+    order = np.argsort(encoded_cells, kind="stable")
+    encoded_cells = encoded_cells[order]
+    remaining_idx_array = remaining_idx_array[order]
+
+    unique_cells, starts = np.unique(encoded_cells, return_index=True)
+    grouped_indices = np.split(remaining_idx_array, starts[1:])
+    grouped_cells = np.column_stack(np.unravel_index(unique_cells, tuple(grid_shape)))
+
+    return {
+        tuple(cell): indices.tolist()
+        for cell, indices in zip(grouped_cells, grouped_indices)
+    }
 
 def compute_spatial_index(
-    xyz: ValidNumericNDArray,
-    kd_tree: KDTree | None = None,
+    points: DaskDataFrame | pd.DataFrame,
     limit: int = 1000,
     starting_grid_shape: tuple[int, ...] | None = None,
     PRINT_DEBUG: bool = False,
@@ -156,11 +174,14 @@ def compute_spatial_index(
     #  boxes and ellipsoids
     # TODO: allows to pass multiple limit values, not just a single one for all the
     #  index levels
+
+    if isinstance(points, DaskDataFrame):
+        xyz = points[["x", "y", "z"]].compute().values
+    else:
+        xyz = points[["x", "y", "z"]].values
+
     if starting_grid_shape is None:
         starting_grid_shape = (1, 1, 1)
-
-    if kd_tree is None:
-        kd_tree = KDTree(xyz)
 
     mins = np.min(xyz, axis=0)
     maxs = np.max(xyz, axis=0)
@@ -181,18 +202,12 @@ def compute_spatial_index(
         parent_cells=parent_cells,
         parent_grid_shape=starting_grid_shape,
     )
-    # to avoid the risk of points in the boundary of the grid not being included;
-    # eps must be relative to the coordinate magnitude, otherwise for large float
-    # values, an absolute eps gets swallowed by floating point precision
-    coordinate_magnitude = max(np.abs(mins).max(), np.abs(maxs).max())
-    # magnitude * dtype_eps gives a ULP (unit in the last place)
-    # we multiply this by a small factor (2)
     if not (
         np.issubdtype(xyz.dtype, np.floating) or np.issubdtype(xyz.dtype, np.integer)
     ):
         raise TypeError(f"Expected numerical dtype for xyz, got {xyz.dtype}")
-    eps = max(1e-6, float(coordinate_magnitude * np.finfo(xyz.dtype).eps * 2))  # type: ignore[type-var]
     len_previous_remaining_indices = len(remaining_indices)
+
 
     while len(remaining_indices) > 0:
         # initialization
@@ -203,44 +218,10 @@ def compute_spatial_index(
                 f"and chunk size {grid_level.chunk_size}. Remaining points: {len(remaining_indices)}"
             )
 
-        # Pass 1: gather remaining indices per cell
-        indices_per_cell: dict[tuple[int, ...], list[int]] = {}
-        for i, j, k in grid_level.iter_cells():
-            centroid = grid_level.centroid((i, j, k))
+        # Pass 1: gather remaining indices per active cell by mapping each point to a
+        # cell with floor division relative to the global bounding box origin.
 
-            # find points in the grid cell
-            # this filters points by a radius r, but we have different values per axis,
-            # so we proceed with manual filtering on the result from the kDTree query
-            indices = kd_tree.query_ball_point(
-                centroid, r=grid_level.chunk_size.max().item() / 2 + eps, p=np.inf
-            )
-            filtered = xyz[indices]
-            half = grid_level.chunk_size / 2
-            mask = (
-                (centroid[0] - half[0] - eps <= filtered[:, 0])
-                & (filtered[:, 0] <= centroid[0] + half[0] + eps)
-                & (centroid[1] - half[1] - eps <= filtered[:, 1])
-                & (filtered[:, 1] <= centroid[1] + half[1] + eps)
-                & (centroid[2] - half[2] - eps <= filtered[:, 2])
-                & (filtered[:, 2] <= centroid[2] + half[2] + eps)
-            )
-            discarded = np.sum(~mask).item()
-            # if discarded > 0:
-            #     # TODO: **possible bug!** This message is not printed while I would
-            #     #  expect that the kDTree query would sometimes return more points than
-            #     #  the mask would allow (this should happen when chunk_size has
-            #     #  different dimensions)
-            #     logger.warning(
-            #         f"{discarded} points were filtered out of {len(indices)} "
-            #         f"during spatial index computation"
-            #     )
-            indices = np.array(indices)[mask].tolist()
-
-            # filter out points that have been previously emitted
-            indices = [idx for idx in indices if idx in remaining_indices]
-
-            if len(indices) > 0:
-                indices_per_cell[(i, j, k)] = indices
+        indices_per_cell = _get_cell_indices_for_level(xyz, remaining_indices, grid_level)
 
         # Pass 2: compute a single global sampling probability from the densest
         # cell, and apply it uniformly to all cells. This preserves relative
@@ -252,12 +233,6 @@ def compute_spatial_index(
             p = min(1.0, limit / max_count)
 
             for cell, indices in indices_per_cell.items():
-                # Re-filter: exclude annotations already emitted by an earlier
-                # cell in this same level (e.g. an annotation spanning multiple
-                # cells would otherwise be emitted more than once).
-                indices = [idx for idx in indices if idx in remaining_indices]
-                if not indices:
-                    continue
                 indices_arr = np.array(indices)
                 keep = RNG.random(len(indices)) < p
                 emitted = indices_arr[keep].tolist()
@@ -280,12 +255,12 @@ def compute_spatial_index(
             lines_x = np.arange(
                 grid_level.mins[0],
                 grid_level.maxs[0] + chunk_size[0],
-                chunk_size[0] + eps,
+                chunk_size[0] if chunk_size[0] > 0 else 1,
             )
             lines_y = np.arange(
                 grid_level.mins[1],
                 grid_level.maxs[1] + chunk_size[1],
-                chunk_size[1] + eps,
+                chunk_size[1] if chunk_size[1] > 0 else 1,
             )
             for x in lines_x:
                 plt.plot(
