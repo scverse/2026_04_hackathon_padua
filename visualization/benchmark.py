@@ -36,55 +36,27 @@ def _generate_point_daskdf(n: int, n_genes: int = 1, seed: int = 42) -> DaskData
 
     return points
 
-def _benchmark_baseline_writing(path: Path, points: DaskDataFrame) -> float:
-    start = time.perf_counter()
-    save_points_parquet(points, path)
-    end = time.perf_counter()
+def _benchmark_writing(path: Path, method: str, points: pd.DataFrame, meta: dict | None = None) -> float:
+    if method == "baseline":
+        start = time.perf_counter()
+        save_points_parquet(points, path)
+        end = time.perf_counter()
+    elif method == "multiscale":
+        start = time.perf_counter()
+        add_morton_from_chunk_key(points)
+        save_multiscale_points(points, meta, path)
+        end = time.perf_counter()
+    else:
+        return None
     return end - start
 
-def _benchmark_baseline_bb_query(path: Path, bbox = ((5, 100), (5, 100))) -> float:
-    start = time.perf_counter()
-    # df = (
-    #     pl.scan_parquet(path)
-    #     .filter(pl.col("x") > bbox[0][0])
-    #     .filter(pl.col("x") < bbox[0][1])
-    #     .filter(pl.col("y") > bbox[1][0])
-    #     .filter(pl.col("y") < bbox[1][1])
-    #     .filter(pl.col("z") > bbox[2][0])
-    #     .filter(pl.col("z") < bbox[2][1])
-    # ).collect()
-    df = query(path, bbox=bbox)
-    end = time.perf_counter()
-    return end - start
-
-def _benchmark_baseline_gene_query(path: Path, gene: str = "gene_0") -> float:
-    start = time.perf_counter()
-    # df = (
-    #     pl.scan_parquet(path)
-    #     .filter(pl.col("gene") == gene)
-    # ).collect()
-    df = query(path, gene=gene)
-    end = time.perf_counter()
-    return end - start
-
-def _benchmark_multiscale_writing(path: Path, points: DaskDataFrame) -> float:
-    start = time.perf_counter()
-    grid = compute_spatial_index(points)
-    meta = build_metadata(points=points, grid=grid)
-    df = grid_to_spatial_index_dataframe(points=points, grid=grid)
-    add_morton_from_chunk_key(df)
-    save_multiscale_points(df, meta, path)
-    end = time.perf_counter()
-    return end - start
-
-def _benchmark_multiscale_bb_query(path: Path) -> float:
-    bbox = ((5, 5), (100, 100))
+def _benchmark_bb_query(path: Path, bbox = ((5, 5), (100, 100))) -> float:
     start = time.perf_counter()
     df = query(path, bbox=bbox)
     end = time.perf_counter()
     return end - start
 
-def _benchmark_multiscale_gene_query(path: Path, gene: str = "gene_0") -> float:
+def _benchmark_gene_query(path: Path, gene: str = "gene_0") -> float:
     start = time.perf_counter()
     df = query(path, gene=gene)
     end = time.perf_counter()
@@ -103,8 +75,10 @@ def run_benchmarks(METHODS, N_GENES, N_POINTS, N_REPS):
             
                 # Generate data
                 points = _generate_point_daskdf(size, n_genes)
+                grid = compute_spatial_index(points)
+                meta = build_metadata(points=points, grid=grid)
+                df = grid_to_spatial_index_dataframe(points=points, grid=grid)
 
-                # TODO: for method in METHODS: ...
                 for method in METHODS:
                     file_size = 0
                     meta_size = 0
@@ -116,35 +90,22 @@ def run_benchmarks(METHODS, N_GENES, N_POINTS, N_REPS):
                         parquet_path = temp_dir / f"test_{size}_{n_genes}_{method}_{rep}.parquet"
                         
                         # Write to parquet
-                        if method == "baseline":
-                            writing_time = _benchmark_baseline_writing(parquet_path, points)
-                        else:
-                            writing_time = _benchmark_multiscale_writing(parquet_path, points)
+                        writing_time = _benchmark_writing(parquet_path, method, df, meta)
                         writing_times.append(writing_time)
 
                         # Get file size
                         if rep == 0:
-                            if method == "baseline": # TODO: adapt this so that we can only use the multiscale version
-                                file_size = sum(f.stat().st_size for f in parquet_path.rglob("*.parquet"))
-                                meta_size = sum(pq.ParquetFile(f).metadata.serialized_size for f in parquet_path.rglob("*.parquet"))
-                            else:
-                                meta_size = pq.ParquetFile(parquet_path).metadata.serialized_size
-                                file_size = os.path.getsize(parquet_path)
+                            meta_size = pq.ParquetFile(parquet_path).metadata.serialized_size
+                            file_size = os.path.getsize(parquet_path)
                             file_size = np.round(file_size / (1024 * 1024), 2)
                             meta_size = np.round(meta_size / 1024, 2)
                         
                         # Bounding box query
-                        if method == "baseline":
-                            query_time = _benchmark_baseline_bb_query(parquet_path)
-                        else:
-                            query_time = _benchmark_multiscale_bb_query(parquet_path)
+                        query_time = _benchmark_bb_query(parquet_path)
                         bb_query_times.append(query_time)
 
                         # Gene query
-                        if method == "baseline":
-                            query_time = _benchmark_baseline_gene_query(parquet_path, "gene_0") # TODO: other gene?
-                        else:
-                            query_time = _benchmark_multiscale_gene_query(parquet_path, "gene_0")
+                        query_time = _benchmark_gene_query(parquet_path, "gene_0")
                         gene_query_times.append(query_time)
                     
                     results.append({
