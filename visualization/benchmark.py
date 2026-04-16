@@ -4,7 +4,6 @@ import spatialdata_plot
 import spatialdata as sd
 import matplotlib.pyplot as plt
 import anndata as ad
-import polars as pl
 from dask.dataframe import to_parquet
 from dask.dataframe import DataFrame as DaskDataFrame
 import time
@@ -17,7 +16,7 @@ import os
 import pyarrow.parquet as pq
 
 from indexing import get_coordinates_and_kd_tree, compute_spatial_index, grid_to_spatial_index_dataframe, add_morton_from_chunk_key
-from io_multiscale import build_metadata, save_multiscale_points, query
+from io_multiscale import build_metadata, save_multiscale_points, query, save_points_parquet
 
 def _generate_point_daskdf(n: int, n_genes: int = 1, seed: int = 42) -> DaskDataFrame:
     sdata = generate_dataset(
@@ -37,34 +36,34 @@ def _generate_point_daskdf(n: int, n_genes: int = 1, seed: int = 42) -> DaskData
 
     return points
 
-def _benchmark_polars_writing(path: Path, points: DaskDataFrame) -> float:
+def _benchmark_baseline_writing(path: Path, points: DaskDataFrame) -> float:
     start = time.perf_counter()
-    to_parquet(points, path)
+    save_points_parquet(points, path)
     end = time.perf_counter()
     return end - start
 
-def _benchmark_polars_bb_query(path: Path) -> float:
-    """Benchmark polars bounding box query."""
-    bb = [[5, 100], [5, 100], [0, 100]]
+def _benchmark_baseline_bb_query(path: Path, bbox = ((5, 100), (5, 100))) -> float:
     start = time.perf_counter()
-    df = (
-        pl.scan_parquet(path)
-        .filter(pl.col("x") > bb[0][0])
-        .filter(pl.col("x") < bb[0][1])
-        .filter(pl.col("y") > bb[1][0])
-        .filter(pl.col("y") < bb[1][1])
-        .filter(pl.col("z") > bb[2][0])
-        .filter(pl.col("z") < bb[2][1])
-    ).collect()
+    # df = (
+    #     pl.scan_parquet(path)
+    #     .filter(pl.col("x") > bbox[0][0])
+    #     .filter(pl.col("x") < bbox[0][1])
+    #     .filter(pl.col("y") > bbox[1][0])
+    #     .filter(pl.col("y") < bbox[1][1])
+    #     .filter(pl.col("z") > bbox[2][0])
+    #     .filter(pl.col("z") < bbox[2][1])
+    # ).collect()
+    df = query(path, bbox=bbox)
     end = time.perf_counter()
     return end - start
 
-def _benchmark_polars_gene_query(path: Path, gene: str = "gene_0") -> float:
+def _benchmark_baseline_gene_query(path: Path, gene: str = "gene_0") -> float:
     start = time.perf_counter()
-    df = (
-        pl.scan_parquet(path)
-        .filter(pl.col("gene") == gene)
-    ).collect()
+    # df = (
+    #     pl.scan_parquet(path)
+    #     .filter(pl.col("gene") == gene)
+    # ).collect()
+    df = query(path, gene=gene)
     end = time.perf_counter()
     return end - start
 
@@ -80,7 +79,7 @@ def _benchmark_multiscale_writing(path: Path, points: DaskDataFrame) -> float:
     return end - start
 
 def _benchmark_multiscale_bb_query(path: Path) -> float:
-    bbox = [(5, 5), (100, 100)]
+    bbox = ((5, 5), (100, 100))
     start = time.perf_counter()
     df = query(path, bbox=bbox)
     end = time.perf_counter()
@@ -118,15 +117,15 @@ def run_benchmarks(METHODS, N_GENES, N_POINTS, N_REPS):
                         parquet_path = temp_dir / f"test_{size}_{n_genes}_{method}_{rep}.parquet"
                         
                         # Write to parquet
-                        if method == "polars":
-                            writing_time = _benchmark_polars_writing(parquet_path, points)
+                        if method == "baseline":
+                            writing_time = _benchmark_baseline_writing(parquet_path, points)
                         else:
                             writing_time = _benchmark_multiscale_writing(parquet_path, points)
                         writing_times.append(writing_time)
 
                         # Get file size
                         if rep == 0:
-                            if method == "polars": # TODO: adapt this so that we can only use the multiscale version
+                            if method == "baseline": # TODO: adapt this so that we can only use the multiscale version
                                 file_size = sum(f.stat().st_size for f in parquet_path.rglob("*.parquet"))
                                 meta_size = sum(pq.ParquetFile(f).metadata.serialized_size for f in parquet_path.rglob("*.parquet"))
                             else:
@@ -136,15 +135,15 @@ def run_benchmarks(METHODS, N_GENES, N_POINTS, N_REPS):
                             meta_size = np.round(meta_size / 1024, 2)
                         
                         # Bounding box query
-                        if method == "polars":
-                            query_time = _benchmark_polars_bb_query(parquet_path)
+                        if method == "baseline":
+                            query_time = _benchmark_baseline_bb_query(parquet_path)
                         else:
                             query_time = _benchmark_multiscale_bb_query(parquet_path)
                         bb_query_times.append(query_time)
 
                         # Gene query
-                        if method == "polars":
-                            query_time = _benchmark_polars_gene_query(parquet_path, "gene_0") # TODO: other gene?
+                        if method == "baseline":
+                            query_time = _benchmark_baseline_gene_query(parquet_path, "gene_0") # TODO: other gene?
                         else:
                             query_time = _benchmark_multiscale_gene_query(parquet_path, "gene_0")
                         gene_query_times.append(query_time)
@@ -179,9 +178,9 @@ def plot_benchmark_results(results: pd.DataFrame, METHODS, N_GENES):
     
     # Colors and markers for different combinations
     styles = {
-        ("polars", 0): {'color': 'blue', 'marker': 'o', 'linestyle': '-'},
-        ("polars", 1): {'color': 'blue', 'marker': 's', 'linestyle': '--'},
-        ("polars", 2): {'color': 'blue', 'marker': '^', 'linestyle': '-.'},
+        ("baseline", 0): {'color': 'blue', 'marker': 'o', 'linestyle': '-'},
+        ("baseline", 1): {'color': 'blue', 'marker': 's', 'linestyle': '--'},
+        ("baseline", 2): {'color': 'blue', 'marker': '^', 'linestyle': '-.'},
         ("multiscale", 0): {'color': 'red', 'marker': 'o', 'linestyle': '-'},
         ("multiscale", 1): {'color': 'red', 'marker': 's', 'linestyle': '--'},
         ("multiscale", 2): {'color': 'red', 'marker': '^', 'linestyle': '-.'},

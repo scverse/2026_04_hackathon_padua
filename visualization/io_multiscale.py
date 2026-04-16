@@ -6,6 +6,7 @@ import pyarrow.parquet as pq
 import json
 from dask.dataframe import DataFrame as DaskDataFrame
 from indexing import GridLevel
+from pathlib import Path
 
 def build_metadata(
     *,
@@ -177,3 +178,36 @@ def query(path, gene=None, bbox=None, max_level=None, columns=None):
         use_pandas_metadata=False,
     ).to_pandas()
 
+def _to_arrow_table(points: pd.DataFrame | DaskDataFrame) -> pa.Table:
+    """Baseline for the benchmark."""
+    if isinstance(points, DaskDataFrame):
+        points = points.compute()
+
+    if isinstance(points, pd.DataFrame):
+        if getattr(points, "attrs", None):
+            points = points.copy()
+            points.attrs = {}
+        return pa.Table.from_pandas(points, preserve_index=False)
+
+    raise TypeError(
+        "Unsupported points type. Expected a pandas, polars, or dask dataframe."
+    )
+
+def save_points_parquet(
+    points: pd.DataFrame | DaskDataFrame,
+    path: str | Path,
+    *,
+    compression: str = "zstd",
+    statistics: bool = True,
+) -> None:
+    """Save a points table directly to a parquet file using pyarrow."""
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    table = _to_arrow_table(points)
+    pq.write_table(
+        table,
+        output_path,
+        compression=compression,
+        write_statistics=statistics,
+    )
