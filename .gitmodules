@@ -1,0 +1,3 @@
+[submodule "R_interoperability/rome"]
+	path = R_interoperability/rome
+	url = https://github.com/Huber-group-EMBL/rome
