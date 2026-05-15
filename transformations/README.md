@@ -1,6 +1,6 @@
-## R Interoperability track
+##  File formats and transformations (NGFF) track
 
-This track introduced new conformance suites and new spatial transformations utilities to existing bioimaging and spatial omics libraries. 
+This track introduced new conformance suites for NGFF transformations and new transformations utilities to existing bioimaging and spatial omics libraries. 
 
 Key achievements are: 
 * A language-agnostic conformance test suite for OME-NGFF RFC-5 coordinate transformations.
