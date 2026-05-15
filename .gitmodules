@@ -1,24 +1,9 @@
 [submodule "R_interoperability/rome"]
 	path = R_interoperability/rome
 	url = https://github.com/Huber-group-EMBL/rome
-[submodule "R_interoperability/SpatialData"]
-	path = R_interoperability/SpatialData
-	url = https://github.com/HelenaLC/SpatialData
 [submodule "R_interoperability/dummy-spatialdata"]
 	path = R_interoperability/dummy-spatialdata
 	url = https://github.com/BIMSBBioinfo/dummy-spatialdata
-[submodule "R_interoperability/ImageArray"]
-	path = R_interoperability/ImageArray
-	url = https://github.com/BIMSBBioinfo/ImageArray
-[submodule "R_interoperability/anndataR"]
-	path = R_interoperability/anndataR
-	url = https://github.com/scverse/anndataR
 [submodule "transformations/ome_zarr_transformations_conformance"]
 	path = transformations/ome_zarr_transformations_conformance
 	url = https://github.com/clbarnes/ome_zarr_transformations_conformance
-[submodule "transformations/multiview-stitcher"]
-	path = transformations/multiview-stitcher
-	url = https://github.com/multiview-stitcher/multiview-stitcher
-[submodule "transformations/transformnd"]
-	path = transformations/transformnd
-	url = https://github.com/clbarnes/transformnd
