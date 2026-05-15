@@ -7,7 +7,7 @@ single-cell and spatial omics.
 ## Venue
 
  - Hotel Garden Inn Padova City Centre
- - 19-22 April, 2026, Padua, Italy.
+ - 14-16 April, 2026, Padua, Italy.
 
 ## Objective and Teams
 
