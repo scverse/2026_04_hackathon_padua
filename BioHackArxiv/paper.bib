@@ -1,0 +1,127 @@
+
+@article{marconatoSpatialDataOpenUniversal2024a,
+  title = {{{SpatialData}}: An Open and Universal Data Framework for Spatial Omics},
+  author = {Marconato, Luca and Palla, Giovanni and Yamauchi, Kevin A. and Virshup, Isaac and Heidari, Elyas and Treis, Tim and Vierdag, Wouter-Michiel and Toth, Marcella and Stockhaus, Sonja and Shrestha, Rahul B. and Rombaut, Benjamin and Pollaris, Lotte and Lehner, Laurens and V{\"o}hringer, Harald and Kats, Ilia and Saeys, Yvan and Saka, Sinem K. and Huber, Wolfgang and Gerstung, Moritz and Moore, Josh and Theis, Fabian J. and Stegle, Oliver},
+  year = {2024},
+  month = mar,
+  journal = {Nature Methods},
+  issn = {1548-7105},
+  doi = {10.1038/s41592-024-02212-x},
+  abstract = {Spatially resolved omics technologies are transforming our understanding of biological tissues. However, the handling of uni- and multimodal spatial omics datasets remains a challenge owing to large data volumes, heterogeneity of data types and the lack of flexible, spatially aware data structures. Here we introduce SpatialData, a framework that establishes a unified and extensible multiplatform file-format, lazy representation of larger-than-memory data, transformations and alignment to common coordinate systems. SpatialData facilitates spatial annotations and cross-modal aggregation and analysis, the utility of which is illustrated in the context of multiple vignettes, including integrative analysis on a multimodal Xenium and Visium breast cancer study.}
+}
+
+@article{mooreOMEZarrCloudoptimizedBioimaging2023a,
+  title = {{{OME-Zarr}}: A Cloud-Optimized Bioimaging File Format with International Community Support},
+  author = {Moore, Josh and {Basurto-Lozada}, Daniela and Besson, S{\'e}bastien and Bogovic, John and Bragantini, Jord{\~a}o and Brown, Eva M. and Burel, Jean-Marie and Casas Moreno, Xavier and {de Medeiros}, Gustavo and Diel, Erin E. and Gault, David and Ghosh, Satrajit S. and Gold, Ilan and Halchenko, Yaroslav O. and Hartley, Matthew and Horsfall, Dave and Keller, Mark S. and Kittisopikul, Mark and Kovacs, Gabor and K{\"u}pc{\"u} Yolda{\c s}, Ayb{\"u}ke and Kyoda, Koji and {le Tournoulx de la Villegeorges}, Albane and Li, Tong and Liberali, Prisca and Lindner, Dominik and Linkert, Melissa and L{\"u}thi, Joel and {Maitin-Shepard}, Jeremy and Manz, Trevor and Marconato, Luca and McCormick, Matthew and Lange, Merlin and Mohamed, Khaled and Moore, William and Norlin, Nils and Ouyang, Wei and {\"O}zdemir, Bugra and Palla, Giovanni and Pape, Constantin and Pelkmans, Lucas and Pietzsch, Tobias and Preibisch, Stephan and Prete, Martin and Rzepka, Norman and Samee, Sameeul and Schaub, Nicholas and Sidky, Hythem and Solak, Ahmet Can and Stirling, David R. and Striebel, Jonathan and Tischer, Christian and Toloudis, Daniel and Virshup, Isaac and Walczysko, Petr and Watson, Alan M. and Weisbart, Erin and Wong, Frances and Yamauchi, Kevin A. and Bayraktar, Omer and Cimini, Beth A. and Gehlenborg, Nils and Haniffa, Muzlifah and Hotaling, Nathan and Onami, Shuichi and Royer, Loic A. and Saalfeld, Stephan and Stegle, Oliver and Theis, Fabian J. and Swedlow, Jason R.},
+  year = {2023},
+  month = sep,
+  journal = {Histochemistry and Cell Biology},
+  volume = {160},
+  number = {3},
+  pages = {223--251},
+  issn = {1432-119X},
+  doi = {10.1007/s00418-023-02209-1},
+  abstract = {A growing community is constructing a next-generation file format (NGFF) for bioimaging to overcome problems of scalability and heterogeneity. Organized by the Open Microscopy Environment (OME), individuals and institutes across diverse modalities facing these problems have designed a format specification process (OME-NGFF) to address these needs. This paper brings together a wide range of those community members to describe the cloud-optimized format itself---OME-Zarr---along with tools and data resources available today to increase FAIR access and remove barriers in the scientific process. The current momentum offers an opportunity to unify a key component of the bioimaging domain---the file format that underlies so many personal, institutional, and global data management and analysis tasks.}
+}
+
+@article{mooreOMENGFFNextgenerationFile2021a,
+  title = {{{OME-NGFF}}: A next-Generation File Format for Expanding Bioimaging Data-Access Strategies},
+  author = {Moore, Josh and Allan, Chris and Besson, S{\'e}bastien and Burel, Jean-Marie and Diel, Erin and Gault, David and Kozlowski, Kevin and Lindner, Dominik and Linkert, Melissa and Manz, Trevor and Moore, Will and Pape, Constantin and Tischer, Christian and Swedlow, Jason R.},
+  year = {2021},
+  month = dec,
+  journal = {Nature Methods},
+  volume = {18},
+  number = {12},
+  pages = {1496--1498},
+  issn = {1548-7105},
+  doi = {10.1038/s41592-021-01326-w},
+  abstract = {The rapid pace of innovation in biological imaging and the diversity of its applications have prevented the establishment of a community-agreed standardized data format. We propose that complementing established open formats such as OME-TIFF and HDF5 with a next-generation file format such as Zarr will satisfy the majority of use cases in bioimaging. Critically, a common metadata format used in all these vessels can deliver truly findable, accessible, interoperable and reusable bioimaging data.}
+}
+
+@article {Virshup2021.12.16.473007,
+	author = {Virshup, Isaac and Rybakov, Sergei and Theis, Fabian J. and Angerer, Philipp and Wolf, F. Alexander},
+	title = {anndata: Annotated data},
+	elocation-id = {2021.12.16.473007},
+	year = {2021},
+	doi = {10.1101/2021.12.16.473007},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {anndata is a Python package for handling annotated data matrices in memory and on disk (github.com/theislab/anndata), positioned between pandas and xarray. anndata offers a broad range of computationally efficient features including, among others, sparse data support, lazy operations, and a PyTorch interface.Statement of need Generating insight from high-dimensional data matrices typically works through training models that annotate observations and variables via low-dimensional representations. In exploratory data analysis, this involves iterative training and analysis using original and learned annotations and task-associated representations. anndata offers a canonical data structure for book-keeping these, which is neither addressed by pandas (McKinney, 2010), nor xarray (Hoyer \&amp; Hamman, 2017), nor commonly-used modeling packages like scikit-learn (Pedregosa et al., 2011).Competing Interest StatementF.J.T. consults for Immunai Inc., Singularity Bio B.V., CytoReason Ltd, and Omniscope Ltd, and has ownership interest in Cellarity Inc. and Dermagnostix GmbH. P.A. and A.W. are full-time employees of Cellarity Inc., and have ownership interest in Cellarity Inc..},
+	URL = {https://www.biorxiv.org/content/early/2021/12/19/2021.12.16.473007},
+	eprint = {https://www.biorxiv.org/content/early/2021/12/19/2021.12.16.473007.full.pdf},
+	journal = {bioRxiv}
+}
+
+@article{7539624,
+  author={Satyanarayan, Arvind and Moritz, Dominik and Wongsuphasawat, Kanit and Heer, Jeffrey},
+  journal={IEEE Transactions on Visualization and Computer Graphics}, 
+  title={Vega-Lite: A Grammar of Interactive Graphics}, 
+  year={2017},
+  volume={23},
+  number={1},
+  pages={341-350},
+  keywords={Data visualization;Grammar;Visualization;Encoding;Transforms;Brushes;Information visualization;interaction;systems;toolkits;declarative specification},
+  doi={10.1109/TVCG.2016.2599030}}
+
+
+@misc{mcnutt2022grammarruleallsurvey,
+      title={No Grammar to Rule Them All: A Survey of JSON-style DSLs for Visualization}, 
+      author={Andrew McNutt},
+      year={2022},
+      eprint={2207.07998},
+      archivePrefix={arXiv},
+      primaryClass={cs.HC},
+      url={https://arxiv.org/abs/2207.07998}, 
+}
+
+@article{GUILLIAMS2022379,
+title = {Spatial proteogenomics reveals distinct and evolutionarily conserved hepatic macrophage niches},
+journal = {Cell},
+volume = {185},
+number = {2},
+pages = {379-396.e38},
+year = {2022},
+issn = {0092-8674},
+doi = {https://doi.org/10.1016/j.cell.2021.12.018},
+url = {https://www.sciencedirect.com/science/article/pii/S0092867421014811},
+author = {Martin Guilliams and Johnny Bonnardel and Birthe Haest and Bart Vanderborght and Camille Wagner and Anneleen Remmerie and Anna Bujko and Liesbet Martens and Tinne Thoné and Robin Browaeys and Federico F. {De Ponti} and Bavo Vanneste and Christian Zwicker and Freya R. Svedberg and Tineke Vanhalewyn and Amanda Gonçalves and Saskia Lippens and Bert Devriendt and Eric Cox and Giuliano Ferrero and Valerie Wittamer and Andy Willaert and Suzanne J.F. Kaptein and Johan Neyts and Kai Dallmeier and Peter Geldhof and Stijn Casaert and Bart Deplancke and Peter {ten Dijke} and Anne Hoorens and Aude Vanlander and Frederik Berrevoet and Yves {Van Nieuwenhove} and Yvan Saeys and Wouter Saelens and Hans {Van Vlierberghe} and Lindsey Devisscher and Charlotte L. Scott},
+keywords = {liver, atlas, spatial transcriptomics, CITE-seq, proteogenomic, across species, multi-omic, lipid-associated macrophage, Kupffer cell, NAFLD},
+abstract = {Summary
+The liver is the largest solid organ in the body, yet it remains incompletely characterized. Here we present a spatial proteogenomic atlas of the healthy and obese human and murine liver combining single-cell CITE-seq, single-nuclei sequencing, spatial transcriptomics, and spatial proteomics. By integrating these multi-omic datasets, we provide validated strategies to reliably discriminate and localize all hepatic cells, including a population of lipid-associated macrophages (LAMs) at the bile ducts. We then align this atlas across seven species, revealing the conserved program of bona fide Kupffer cells and LAMs. We also uncover the respective spatially resolved cellular niches of these macrophages and the microenvironmental circuits driving their unique transcriptomic identities. We demonstrate that LAMs are induced by local lipid exposure, leading to their induction in steatotic regions of the murine and human liver, while Kupffer cell development crucially depends on their cross-talk with hepatic stellate cells via the evolutionarily conserved ALK1-BMP9/10 axis.}
+}
+
+@article {Pollaris2024.07.04.601829,
+	author = {Pollaris, Lotte and Vanneste, Bavo and Rombaut, Benjamin and Defauw, Arne and Vernaillen, Frank and Mortier, Julien and Vanhenden, Wout and Martens, Liesbet and Thon{\'e}, Tinne and Hastir, Jean-Francois and Bujko, Anna and Saelens, Wouter and Marine, Jean-Christophe and Nelissen, Hilde and Van Hamme, Evelien and Seurinck, Ruth and Scott, Charlotte L. and Guilliams, Martin and Saeys, Yvan},
+	title = {SPArrOW: a flexible, interactive and scalable pipeline for spatial transcriptomics analysis},
+	elocation-id = {2024.07.04.601829},
+	year = {2024},
+	doi = {10.1101/2024.07.04.601829},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {Current spatial transcriptomics technologies are increasingly able to measure large gene panels at subcellular resolution, but a major bottleneck in this rapidly advancing field is the computational analysis and interpretation of the data. To bridge this gap, here we present SPArrOW, a flexible, modular and scalable pipeline for processing spatial transcriptomics data. SPArrOW improves cell segmentation and leads to better overall data quality, resulting in more accurate cell annotations at the single-cell level. Furthermore, it provides the users with numerous visual quality checks that are crucial for the correct interpretation of the data, offering users more control in processing their data. Our workflow is designed to accommodate the various available spatial transcriptomics platforms. Finally, SPArrOW offers interactive visualization and data exploration, enabling sample-specific pipeline optimization by various tuneable parameters and an efficient comparison of different staining and gene allocation strategies.Competing Interest StatementThe authors have declared no competing interest.},
+	URL = {https://www.biorxiv.org/content/early/2024/07/06/2024.07.04.601829},
+	eprint = {https://www.biorxiv.org/content/early/2024/07/06/2024.07.04.601829.full.pdf},
+	journal = {bioRxiv}
+}
+
+@article{schapiroMCMICROScalableModular2022,
+  title = {{{MCMICRO}}: A Scalable, Modular Image-Processing Pipeline for Multiplexed Tissue Imaging},
+  author = {Schapiro, Denis and Sokolov, Artem and Yapp, Clarence and Chen, Yu-An and Muhlich, Jeremy L. and Hess, Joshua and Creason, Allison L. and Nirmal, Ajit J. and Baker, Gregory J. and Nariya, Maulik K. and Lin, Jia-Ren and Maliga, Zoltan and Jacobson, Connor A. and Hodgman, Matthew W. and Ruokonen, Juha and Farhi, Samouil L. and Abbondanza, Domenic and McKinley, Eliot T. and Persson, Daniel and Betts, Courtney and Sivagnanam, Shamilene and Regev, Aviv and Goecks, Jeremy and Coffey, Robert J. and Coussens, Lisa M. and Santagata, Sandro and Sorger, Peter K.},
+  year = {2022},
+  month = mar,
+  journal = {Nature Methods},
+  volume = {19},
+  number = {3},
+  pages = {311--315},
+  issn = {1548-7105},
+  doi = {10.1038/s41592-021-01308-y},
+  abstract = {Highly multiplexed tissue imaging makes detailed molecular analysis of single cells possible in a preserved spatial context. However, reproducible analysis of large multichannel images poses a substantial computational challenge. Here, we describe a modular and open-source computational pipeline, MCMICRO, for performing the sequential steps needed to transform whole-slide images into single-cell data. We demonstrate the use of MCMICRO on tissue and tumor images acquired using multiple imaging platforms, thereby providing a solid foundation for the continued development of tissue imaging software.}
+}
+
+@misc{long2023spacetxroadmapbenchmarkingspatial,
+      title={SpaceTx: A Roadmap for Benchmarking Spatial Transcriptomics Exploration of the Brain}, 
+      author={Brian Long and Jeremy Miller and The SpaceTx Consortium},
+      year={2023},
+      eprint={2301.08436},
+      archivePrefix={arXiv},
+      primaryClass={q-bio.NC},
+      url={https://arxiv.org/abs/2301.08436}, 
+}
