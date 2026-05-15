@@ -13,3 +13,12 @@
 [submodule "R_interoperability/anndataR"]
 	path = R_interoperability/anndataR
 	url = https://github.com/scverse/anndataR
+[submodule "transformations/ome_zarr_transformations_conformance"]
+	path = transformations/ome_zarr_transformations_conformance
+	url = https://github.com/clbarnes/ome_zarr_transformations_conformance
+[submodule "transformations/multiview-stitcher"]
+	path = transformations/multiview-stitcher
+	url = https://github.com/multiview-stitcher/multiview-stitcher
+[submodule "transformations/transformnd"]
+	path = transformations/transformnd
+	url = https://github.com/clbarnes/transformnd
