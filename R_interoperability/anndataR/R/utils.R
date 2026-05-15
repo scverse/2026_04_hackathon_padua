@@ -1,0 +1,316 @@
+wrap_message <- function(...) {
+  txt <- paste0(..., collapse = "")
+  paste(strwrap(txt, exdent = 2L), collapse = "\n")
+}
+
+has_row_names <- function(x) {
+  if (is.data.frame(x)) {
+    .row_names_info(x) > 0
+  } else {
+    !is.null(dimnames(x)[[1]])
+  }
+}
+
+get_shape <- function(obs, var, X, shape) {
+  n_obs <-
+    if (!is.null(obs)) {
+      nrow(obs)
+    } else if (!is.null(X)) {
+      nrow(X)
+    } else if (!is.null(shape)) {
+      shape[[1]]
+    } else {
+      0L
+    }
+  n_vars <-
+    if (!is.null(var)) {
+      nrow(var)
+    } else if (!is.null(X)) {
+      ncol(X)
+    } else if (!is.null(shape)) {
+      shape[[2]]
+    } else {
+      0L
+    }
+  c(n_obs, n_vars)
+}
+
+get_initial_obs <- function(obs, X, shape) {
+  if (is.null(obs)) {
+    obs <- data.frame(matrix(NA, nrow = shape[[1]], ncol = 0))
+    if (!is.null(X)) {
+      rownames(obs) <- rownames(X)
+    }
+  }
+  obs
+}
+
+get_initial_var <- function(var, X, shape) {
+  if (is.null(var)) {
+    var <- data.frame(matrix(NA, nrow = shape[[2]], ncol = 0))
+    if (!is.null(X)) {
+      rownames(var) <- colnames(X)
+    }
+  }
+  var
+}
+
+to_py_matrix <- function(mat) {
+  if (inherits(mat, "dgCMatrix")) {
+    mat <- as(mat, "RsparseMatrix")
+  } else if (!inherits(mat, "dgRMatrix")) {
+    mat <- as.matrix(mat)
+  }
+  Matrix::t(mat)
+}
+
+# nolint start: object_name_linter
+to_R_matrix <- function(mat) {
+  # nolint end: object_name_linter
+  if (inherits(mat, "dgRMatrix")) {
+    mat <- as(mat, "CsparseMatrix")
+  } else if (!inherits(mat, "dgCMatrix")) {
+    mat <- as.matrix(mat)
+  }
+  Matrix::t(mat)
+}
+
+self_name <- function(x) {
+  if (is.null(names(x))) {
+    x <- setNames(x, x)
+  } else if (!all(nzchar(names(x)))) {
+    is_missing <- !nzchar(names(x))
+    names(x)[is_missing] <- x[is_missing]
+  }
+
+  x
+}
+
+#' Get mapping
+#'
+#' Get a mapping argument for a conversion function
+#'
+#' @param mapping The user-supplied mapping argument. Can be a named vector,
+#'   `TRUE` or `FALSE`.
+#' @param guesser A function that guesses the default mapping from `obj` if
+#'   `mapping` is `TRUE`
+#' @param obj The object that is being converted and is passed to `guesser`
+#'   if needed
+#' @param name The name of the mapping argument, used for error messages
+#' @param ... Additional arguments passed to `guesser`
+#'
+#' @description
+#' If `mapping` is `NULL` or empty it is set to `FALSE` with a warning. `FALSE`
+#' values return an empty mapping.
+#'
+#' @returns A named mapping vector
+#' @noRd
+get_mapping <- function(mapping, guesser, obj, name, ...) {
+  if (rlang::is_empty(mapping)) {
+    cli_warn(c(
+      "The {.arg {name}} argument is empty, setting it to {.val {FALSE}}"
+    ))
+
+    mapping <- FALSE
+  }
+
+  # If FALSE, return an empty mapping
+  if (isFALSE(mapping)) {
+    return(list())
+  }
+
+  # If TRUE, use the guesser function to get the default mapping
+  if (isTRUE(mapping)) {
+    return(guesser(obj, ...))
+  }
+
+  if (!is.vector(mapping)) {
+    cli_abort(paste(
+      "{.arg {name}} must be a vector, {.val {TRUE}} or {.val {FALSE}}, not",
+      "{.cls {class(mapping)}}"
+    ))
+  }
+
+  # Make sure provided mapping has names
+  self_name(mapping)
+}
+
+#' Check dimensions and skip
+#'
+#' Check the dimensions of a matrix-like object and return `NULL` if they do not
+#' match the expected dimensions, with a warning. For use in conversion
+#' functions to skip items that do not match the required dimensions.
+#'
+#' @param x The object to check
+#' @param field The field the object comes from, used in the warning message
+#' @param name The name of the object, used in the warning message
+#' @param expected_dims Expected dimensions
+#' @param expected_rows Expected number of rows
+#' @param expected_cols Expected number of columns
+#'
+#' @returns The object `x` if it matches the expected dimensions, otherwise
+#'   `NULL`
+#' @noRd
+check_dims_and_skip <- function(
+  x,
+  field,
+  name,
+  expected_dims = NULL,
+  expected_rows = NULL,
+  expected_cols = NULL
+) {
+  msg <- NULL
+
+  if (!is.null(expected_dims) && !identical(dim(x), expected_dims)) {
+    expected_dims <- as.integer(expected_dims)
+    msg <- c(
+      "i" = paste0(
+        "Expected [{style_vec(expected_dims)}], ",
+        "got [{style_vec(as.integer(dim(x)))}]"
+      )
+    )
+  } else if (!is.null(expected_rows) && nrow(x) != expected_rows) {
+    msg <- c(
+      "i" = paste0(
+        "Expected {.val {expected_rows}} rows, got {.val {nrow(x)}}"
+      )
+    )
+  } else if (!is.null(expected_cols) && ncol(x) != expected_cols) {
+    msg <- c(
+      "i" = paste0(
+        "Expected {.val {expected_cols}} colums, got {.val {ncol(x)}}"
+      )
+    )
+  }
+
+  if (!is.null(msg)) {
+    cli_warn(
+      c(
+        "Skipping {.field {field}} {.val {name}} with unexpected dimensions",
+        msg
+      ),
+      call = NULL
+    )
+
+    NULL
+  } else {
+    x
+  }
+}
+
+#' Warn matrix dim names not writeable
+#'
+#' Warn that matrix dim names can not be written to a given object
+#'
+#' @param mat The object to check, if not a matrix-like object nothing is
+#' checked
+#' @param label A label for `mat` to use in warning messages
+#' @param to_object The object to which `mat` would be written
+#' @param rows Whether to check row names
+#' @param cols Whether to check column names
+#'
+#' @returns `NULL`, invisibly
+#' @noRd
+# nolint start: object_name_linter
+warn_matrix_dimnames_not_writeable <- function(
+  mat,
+  label,
+  to_object,
+  rows = TRUE,
+  cols = TRUE
+) {
+  # nolint end: object_name_linter
+  if (!is.matrix(mat) && !inherits(mat, "Matrix")) {
+    return(invisible())
+  }
+
+  if (rows && !is.null(rownames(mat))) {
+    cli_warn(
+      c(
+        paste(
+          "Matrix row names cannot be written to {.obj_type_friendly {to_object}},",
+          "they will be lost"
+        ),
+        "i" = paste(
+          "To write row names for {.field {label}}, store it as",
+          "{.cls data.frame} instead of {.obj_type_friendly {mat}}"
+        ),
+        "i" = "{.strong NOTE:} {.field obs_names} and {.field var_names} are stored separately"
+      ),
+      call = NULL
+    )
+  }
+
+  if (cols && !is.null(colnames(mat))) {
+    cli_warn(
+      c(
+        paste(
+          "Matrix column names cannot be written to {.obj_type_friendly {to_object}},",
+          "they will be lost"
+        ),
+        "i" = paste(
+          "To write column names for {.field {label}}, store it as",
+          "{.cls data.frame} instead of {.obj_type_friendly {mat}}"
+        ),
+        "i" = "{.strong NOTE:} {.field obs_names} and {.field var_names} are stored separately"
+      ),
+      call = NULL
+    )
+  }
+
+  invisible()
+}
+
+#' Construct a sparse matrix from CSR/CSC components
+#'
+#' Build a `dgCMatrix` or `dgRMatrix` from raw data, index, and pointer vectors.
+#'
+#' @param data Non-zero values. Coerced to `double`.
+#' @param indices Column indices (CSC) or row indices (CSR), 0-based. Coerced
+#'   to `integer`.
+#' @param indptr Index pointers, 0-based. Coerced to `integer`.
+#' @param shape Matrix dimensions. Coerced to `integer`.
+#' @param type Either `"csc_matrix"` or `"csr_matrix"`.
+#'
+#' @return A `dgCMatrix` (CSC) or `dgRMatrix` (CSR).
+#'
+#' @noRd
+construct_sparse_matrix <- function(
+  data,
+  indices,
+  indptr,
+  shape,
+  type = c("csc_matrix", "csr_matrix")
+) {
+  type <- match.arg(type)
+
+  data <- as.double(data)
+  indices <- as.integer(indices)
+  indptr <- as.integer(indptr)
+  shape <- as.integer(shape)
+
+  # The Matrix package validity checks require that indices are sorted within
+  # each major axis group (row indices within columns for CSC, column indices
+  # within rows for CSR). For sparse matrices in Python order isn't guaranteed,
+  # so we sort if needed.
+  if (length(indices) > 1L) {
+    row_lengths <- diff(indptr)
+    group_ids <- rep.int(seq_along(row_lengths), row_lengths)
+    ord <- order(group_ids, indices)
+    if (is.unsorted(ord)) {
+      indices <- indices[ord]
+      data <- data[ord]
+    }
+  }
+
+  if (type == "csc_matrix") {
+    # Directly construct dgCMatrix (CSC format) to avoid overhead of constructing
+    # a general sparseMatrix and then coercing to dgCMatrix
+    # Slots: i = row indices (0-based), p = col pointers, x = values, Dim
+    new("dgCMatrix", i = indices, p = indptr, x = data, Dim = shape)
+  } else if (type == "csr_matrix") {
+    # Directly construct dgRMatrix (CSR format)
+    # Slots: j = column indices (0-based), p = row pointers, x = values, Dim
+    new("dgRMatrix", j = indices, p = indptr, x = data, Dim = shape)
+  }
+}

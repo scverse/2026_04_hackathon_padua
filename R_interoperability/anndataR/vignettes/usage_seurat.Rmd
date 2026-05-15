@@ -1,0 +1,169 @@
+---
+title: Read/write Seurat objects using anndataR
+package: anndataR
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Read/write Seurat objects using anndataR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r options, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE
+)
+```
+
+# Introduction
+
+This vignette demonstrates how to read and write `Seurat` objects using the `r Biocpkg("anndataR")` package, leveraging the interoperability between `Seurat` and the `AnnData` format.
+
+`r CRANpkg("Seurat")` is a widely used toolkit for single-cell analysis in R.
+`r Biocpkg("anndataR")` enables conversion between `Seurat` objects and `AnnData` objects, allowing you to leverage the strengths of both the [scverse](https://scverse.org/) and [Seurat](https://satijalab.org/seurat/) ecosystems.
+
+## Prerequisites
+
+This vignette requires the `r CRANpkg("Seurat")` package in addition to `r Biocpkg("anndataR")`.
+You can install them using the following code:
+
+```r
+install.packages("Seurat")
+```
+
+# Reading H5AD files and Zarr stores to a `Seurat` Object
+
+Using an example `.h5ad` file included in the package, we will demonstrate how to read an `.h5ad` file and convert it to a `Seurat` object.
+
+```{r prep-file}
+library(anndataR)
+library(Seurat)
+
+h5ad_file <- system.file("extdata", "example.h5ad", package = "anndataR")
+```
+
+Read the `.h5ad` file as a `Seurat` object:
+
+```{r read-data}
+seurat_obj <- read_h5ad(h5ad_file, as = "Seurat")
+seurat_obj
+```
+
+This is equivalent to reading in the `.h5ad` file as an `AnnData` and explicitly converting:
+
+```{r convert-seurat}
+adata <- read_h5ad(h5ad_file)
+seurat_obj <- adata$as_Seurat()
+seurat_obj
+```
+
+Similarly, we can read from a Zarr store which we also demonstrate with an example `.zarr` store: 
+
+```{r prep-file-zarr}
+# Please use "example_v3.zarr.zip" for AnnData stored as Zarr version 3
+zarr_path <- system.file("extdata", "example_v2.zarr.zip", package = "anndataR")
+td <- tempdir(check = TRUE)
+unzip(zarr_path, exdir = td)
+zarr_path <- file.path(td, "example_v2.zarr")
+
+seurat_obj_zarr <- read_zarr(zarr_path, as = "Seurat")
+seurat_obj_zarr
+```
+
+or 
+
+```{r convert-seurat-zarr}
+adata <- read_zarr(zarr_path)
+seurat_obj_zarr <- adata$as_Seurat()
+seurat_obj_zarr
+```
+
+# Mapping between `AnnData` and `Seurat`
+
+Figure \@ref(fig:mapping) shows the structures of the `AnnData` and `Seurat` objects and how `r Biocpkg("anndataR")` maps between them.
+It is important to note that matrices in the two objects are transposed relative to each other.
+
+```{r mapping, fig.cap = "Mapping between `AnnData` and `Seurat` objects", fig.wide = TRUE, echo = FALSE}
+knitr::include_graphics("../man/figures/AnnData-Seurat.png")
+```
+
+By default, all items in most slots are converted using the same names.
+An exception is the `varp` slot which doesn't have a corresponding slot in `Seurat`.
+Items in the `varm` slot are only converted when they are specified in a mapping argument.
+The `Neighbors` and `Images` slots are not mapped when converting from `Seurat`.
+See `?as_Seurat` for more details on the default mapping.
+
+# Customizing the conversion
+
+You can customize the conversion process by providing specific mappings for each slot in the `Seurat` object.
+
+Each of the mapping arguments can be provided with one of the following:
+
+- `TRUE`: all items in the slot will be copied using the default mapping
+- `FALSE`: the slot will not be copied
+- A (named) character vector: the names are the names of the slot in the `Seurat` object, the values are the names of the slot in the `AnnData` object.
+
+See `?as_Seurat` for more details on how to customize the conversion process. For instance:
+
+```{r customize-seurat-conversion}
+seurat_obj <- adata$as_Seurat(
+  layers_mapping = c("counts", "dense_counts"),
+  object_metadata_mapping = c(metadata1 = "Int", metadata2 = "Float"),
+  assay_metadata_mapping = FALSE,
+  reduction_mapping = list(
+    pca = c(key = "PC_", embeddings = "X_pca", loadings = "PCs"),
+    umap = c(key = "UMAP_", embeddings = "X_umap")
+  ),
+  graph_mapping = TRUE,
+  misc_mapping = c(misc1 = "Bool", misc2 = "IntScalar")
+)
+seurat_obj
+```
+
+The mapping arguments can also be passed directly to `read_h5ad()`.
+
+# Writing a `Seurat` object to a H5AD file or Zarr store
+
+The reverse conversion is also possible, allowing you to convert the `Seurat` object back to an `AnnData` object, or to just write out the `Seurat` object as an `.h5ad` file or `.zarr` store. 
+
+```{r write-seurat, eval=FALSE}
+write_h5ad(seurat_obj, tempfile(fileext = ".h5ad"))
+write_zarr(seurat_obj, tempfile(fileext = ".zarr"))
+```
+
+This is equivalent to converting the `Seurat` object to an `AnnData` object and then writing it out:
+
+```{r convert-to-anndata, eval=FALSE}
+adata <- as_AnnData(seurat_obj)
+adata$write_h5ad(tempfile(fileext = ".h5ad"))
+adata$write_zarr(tempfile(fileext = ".zarr"))
+```
+
+You can again customize the conversion process by providing specific mappings for each slot in the `AnnData` object.
+For more details, see `?as_AnnData`.
+
+Here's an example:
+
+```{r customize-anndata-conversion}
+adata <- as_AnnData(
+  seurat_obj,
+  assay_name = "RNA",
+  x_mapping = "counts",
+  layers_mapping = c("dense_counts"),
+  obs_mapping = c(RNA_count = "nCount_RNA", metadata1 = "metadata1"),
+  var_mapping = FALSE,
+  obsm_mapping = list(X_pca = "pca", X_umap = "umap"),
+  obsp_mapping = TRUE,
+  uns_mapping = c("misc1", "misc2")
+)
+adata
+```
+
+The mapping arguments can also be passed directly to `write_h5ad()` or `write_zarr()`.
+
+# Session info
+
+```{r sessioninfo}
+sessionInfo()
+```

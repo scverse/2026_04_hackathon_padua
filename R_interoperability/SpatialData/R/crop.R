@@ -1,0 +1,278 @@
+#' @name crop
+#' @title spatial cropping
+#'
+#' @description \code{crop} subsets \code{SpatialData} elements according 
+#' to a rectangular bounding box or arbitrary polygonal shapes.
+#' 
+#' For \code{SpatialData} objects, \code{crop} propagates the operation 
+#' across all layers that share the coordinate space \code{j}.
+#' 
+#' For \code{SpatialDataFrame}s (points and shapes), cropping relies on 
+#' \code{sf::st_intersects} (i.e., instances that intersect the 
+#' query region in any way are kept). For circle shapes, radii 
+#' are currently ignored (i.e., a circle is kept if its centroid 
+#' intersects the query region).
+#' 
+#' For \code{SpatialDataArray}s (images and labels), only bounding box 
+#' cropping is supported. The requested spatial bounding box is 
+#' projected into pixel coordinates, and the underlying array is 
+#' sliced accordingly. The \code{wh} metadata is updated to 
+#' reflect the new spatial extent.
+#'
+#' @param x \code{SpatialData} object or element.
+#' @param y query specification;
+#' bounding box: length-4 numeric list with names 'xmin/xmax/ymin/ymax',
+#' or an \code{st_bbox};
+#' polygon: numeric matrix with 2 columns (= xy-coordinates), 
+#' or an \code{st_polygon} (\code{sfg}) or \code{sfc}/\code{sf} object.
+#' @param j character string specifying a coordinate system.
+#' @param ... optional arguments passed to and from other methods.
+#'
+#' @return same as input
+#'
+#' @examples
+#' zs <- file.path("extdata", "blobs.zarr")
+#' zs <- system.file(zs, package="SpatialData")
+#' sd <- readSpatialData(zs, tables=FALSE)
+#'
+#' # bounding box crop of a SpatialData object
+#' y <- list(xmin=10, xmax=50, ymin=10, ymax=50)
+#' crop(sd, y, j="global")
+#'
+#' # cropping individual elements
+#' a <- sf::st_bbox(c(xmin=10, xmax=50, ymin=10, ymax=50))
+#' b <- matrix(c(10,10, 25,50, 40,10, 10,10), ncol=2, byrow=TRUE)
+#' p <- crop(point(sd), a)
+#' q <- crop(point(sd), b)
+#' 
+#' plot(p$geometry, col="blue")
+#' plot(q$geometry, col="red", add=TRUE)
+#' plot(sf::st_as_sfc(a), add=TRUE)
+#' lines(b, type="l")
+NULL
+
+.check_box <- \(bb) {
+    xy <- c("xmin", "xmax", "ymin", "ymax")
+    ok <- c(
+        is.list(bb), 
+        length(bb) == 4, 
+        setequal(names(bb), xy))
+    if (!all(ok)) stop(
+        "Invalid bounding box structure; should be length-4 ",
+        "numeric list with names 'xmin/xmax/ymin/ymax'")
+    # check values
+    v <- unlist(bb)
+    ok <- c(
+        !is.na(v),
+        is.numeric(v), 
+        v["xmin"] <= v["xmax"], 
+        v["ymin"] <= v["ymax"])
+    if (!all(ok)) stop(
+        "Invalid bounding box values; should be length-4 ",
+        "numeric list with names 'xmin/xmax/ymin/ymax'")
+}
+
+.check_pol <- \(mx) {
+    ok <- c(
+        is.matrix(mx), is.numeric(mx),
+        ncol(mx) == 2, !is.na(mx), is.finite(mx))
+    if (!all(ok)) stop(
+        "Invalid polygon; should be numeric matrix with ",
+        "exactly 2 columns (= xy-coordinates)")
+    if (nrow(mx) < 3) {
+        bb <- st_bbox(mx)
+        mx <- matrix(c(
+            bb$xmin, bb$ymin,
+            bb$xmax, bb$ymin,
+            bb$xmax, bb$ymax,
+            bb$xmin, bb$ymax,
+            bb$xmin, bb$ymin), 
+            ncol=2, byrow=TRUE)
+        return(mx)
+    }
+    # ensure polygon is closed
+    top <- mx[1, ]
+    bot <- mx[nrow(mx), ]
+    if (!all(top == bot))
+        mx <- rbind(mx, top)
+    return(mx)
+}
+
+#' @importFrom sf st_as_sf st_coordinates
+.box2rev <- \(x, y, j=1) {
+    # align query bounding box
+    y <- y[c("xmin", "xmax", "ymin", "ymax")]
+    df <- data.frame(
+        x=c(y$xmin, y$xmax, y$xmax, y$xmin, y$xmin),
+        y=c(y$ymin, y$ymin, y$ymax, y$ymax, y$ymin),
+        id=seq_len(5))
+    # get transformation for space j
+    if (is.numeric(j)) j <- CTname(x)[j]
+    ct <- CTlist(x)[[match(j, CTname(x))]]
+    # identify spatial axes
+    axs <- axes(x)
+    nms <- vapply(axs, \(.) .$name, character(1))
+    ix <- match("x", nms)
+    iy <- match("y", nms)
+    if (is.na(ix) || is.na(iy)) {
+        # default to last two (YX)
+        n <- length(nms)
+        ix <- n; iy <- n-1
+    }
+    # helper to adapt transformation data to spatial (XY) dims
+    .adapt <- \(t, type) {
+        if (is.null(t)) return(NULL)
+        if (type %in% c("scale", "translation"))
+            return(c(t[ix], t[iy]))
+        if (type == "rotate") 
+            return(t[1])
+        return(t)
+    }
+    # adapt transformation
+    if (ct$type == "sequence") {
+        for (i in seq_along(ct$transformations)) {
+            type <- ct$transformations[[i]]$type
+            data <- ct$transformations[[i]][[type]]
+            ct$transformations[[i]][[type]] <- .adapt(data, type)
+        }
+    } else {
+        type <- ct$type
+        data <- ct[[type]]
+        ct[[type]] <- .adapt(data, type)
+    }
+    # update input axes from 'cyx' to 'xy'
+    ct$input$axes <- .default_ax(type="frame")
+    # create temporary shape & transform back
+    md <- SpatialDataAttrs(type="frame", trans=list(ct))
+    z <- SpatialDataShape(df, meta=md)
+    z <- transform(z, 1, rev=TRUE)
+    # extract coordinates & return range
+    z <- st_coordinates(st_as_sf(data(z)))
+    z <- as.list(c(range(z[, 1]), range(z[, 2])))
+    names(z) <- names(y)
+    return(z)
+}
+
+#' @export
+#' @rdname crop
+#' @importFrom methods is
+#' @importFrom sf st_bbox
+setMethod("crop", "SpatialDataArray", \(x, y, j=1, ...) {
+    if (is.matrix(y)) {
+        y <- .check_pol(y)
+        y <- st_bbox(st_polygon(list(y)))
+    }
+    if (inherits(y, c("sf", "sfc", "sfg", "bbox")))
+        y <- as.list(st_bbox(y))
+    # coordinate space alignment
+    .check_box(y)
+    z <- .box2rev(x, y, j)
+    # offset current origin
+    wh <- metadata(x)$wh
+    if (!is.null(wh)) {
+        z$xmin <- z$xmin - wh[[1]][1]
+        z$xmax <- z$xmax - wh[[1]][1]
+        z$ymin <- z$ymin - wh[[2]][1]
+        z$ymax <- z$ymax - wh[[2]][1]
+    }
+    # assure query is within bounds (n=3: cyx; n=2: yx)
+    n <- length(d <- dim(x))
+    z$xmin <- floor(max(z$xmin, 0))
+    z$ymin <- floor(max(z$ymin, 0))
+    z$xmax <- ceiling(min(z$xmax, d[n]))
+    z$ymax <- ceiling(min(z$ymax, d[n-1]))
+    # update origin
+    if (is.null(wh)) {
+        # set from bounding box
+        wh <- list(
+            c(z$xmin, z$xmax), 
+            c(z$ymin, z$ymax))
+    } else {
+        # offset current origin
+        wh[[1]] <- wh[[1]][1] + c(z$xmin, z$xmax)
+        wh[[2]] <- wh[[2]][1] + c(z$ymin, z$ymax)
+    }
+    metadata(x)$wh <- wh
+    # subset array
+    i <- seq(z$ymin+1, z$ymax)
+    j <- seq(z$xmin+1, z$xmax) 
+    if (n == 3) x[, i, j] else x[i, j]
+})
+
+#' @export
+#' @rdname crop
+#' @importFrom dplyr pull
+#' @importFrom duckspatial ddbs_intersects
+#' @importFrom sf st_sf st_sfc st_as_sfc st_bbox st_polygon st_geometry<-
+setMethod("crop", "SpatialDataFrame", \(x, y, j=1, ...) {
+    if (inherits(y, "sf")) {
+        fd <- y
+        st_geometry(fd) <- "geometry"
+    } else if (inherits(y, "sfc")) {
+        fd <- st_sf(geometry=y)
+    } else if (inherits(y, "sfg")) {
+        fd <- st_sf(geometry=st_sfc(y))
+    } else if (inherits(y, "bbox")) {
+        fd <- st_sf(geometry=st_as_sfc(y))
+    } else if (is.matrix(y)) {
+        mx <- .check_pol(y)
+        fd <- st_sf(geometry=st_sfc(st_polygon(list(mx))))
+    } else {
+        # bounding box
+        .check_box(y)
+        fd <- st_sf(geometry=st_as_sfc(st_bbox(unlist(y))))
+    }
+    df <- data(transform(x, j))
+    fd <- data(SpatialDataShape(fd))
+    ok <- ddbs_intersects(df, fd, sparse=TRUE)
+    id_x <- NULL # R CMD check
+    x[pull(ok, id_x), ]
+})
+
+#' @export
+#' @rdname crop
+#' @importFrom dplyr right_join
+setMethod("crop", "SpatialData", \(x, y, j=1, ...) {
+    if (is.numeric(j)) j <- CTname(x)[j]
+    # crop elements that share coordinate space 'j'
+    z <- .lapplyLayer(x, \(.) {
+        if (j %in% CTname(.)) {
+            crop(., y, j=j)
+        } else list()
+    }) 
+    # drop elements without content
+    z <- .lapplyElement(z, \(.) if (length(.) > 0) .)
+    z <- do.call("SpatialData", z)
+    tables(z) <- tables(x)
+    # filter tables for remaining region(s)/instance(s)
+    rs <- unlist(colnames(z))
+    ts <- lapply(tables(z), \(t) {
+        # filter for remaining element(s)
+        t <- t[, regions(t) %in% rs]
+        region(t) <- intersect(region(t), rs)
+        # table's regions-instances
+        df <- data.frame(
+            r=regions(t), 
+            i=instances(t),
+            keep=seq_len(ncol(t)))
+        # for each annotated element
+        rs <- intersect(region(t), unlist(colnames(z)))
+        is <- lapply(rs, \(r) {
+            # subset look-up
+            df <- df[df$r == r, ]
+            e <- element(z, r)
+            if (is(e, "SpatialDataShape")) {
+                # element's regions-instances
+                ik <- instance_key(t)
+                i <- if (ik %in% names(e)) e[[ik]] else seq_along(e)
+                fd <- data.frame(r, i)
+                # return table indices in element
+                right_join(df, fd, names(fd))$keep
+            } else df$keep
+        })
+        # subset table instances
+        t <- t[, unlist(is)]
+    })
+    tables(z) <- ts
+    return(z)
+})

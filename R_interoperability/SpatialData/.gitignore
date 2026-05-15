@@ -1,0 +1,8 @@
+R/_*
+*.Rproj
+.DS_Store
+.Rhistory
+.Rproj.user
+vignettes/*html
+vignettes/*cache
+vignettes/*files
