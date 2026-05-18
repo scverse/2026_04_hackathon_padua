@@ -7,67 +7,84 @@ tags:
   - scverse
   - OME-NGFF
 authors:
+  - name: Artür Manukyan 
+    orcid: 0000-0002-0441-9517
+    affiliation: 1
   - name: Luca Marconato
     orcid: 0000-0003-3198-1326
-    affiliation: 1
-  - name: Kevin A. Yamauchi
-    orcid: 0000-0002-7818-1388
-    affiliation: 2, 3
-  - name: Mark S. Keller
-    orcid: 0000-0003-3003-874X
+    affiliation: 2,3
+  - name: Marvin Albert 
+    orcid: 0000-0003-2536-2545
     affiliation: 4
-  - name: Grzegorz Bokota
-    orcid: 0000-0002-5470-1676
+  - name: Chris Barnes
+    orcid: 
     affiliation: 5
-  - name: Tong Li
-    orcid: 0000-0002-8240-4476
+  - name: Alexander Blume 
+    orcid: 0000-0003-3045-8234
+    affiliation: 1
+  - name: Lorenzo Cerrone
+    orcid: 0000-0001-7337-2313
     affiliation: 6
+  - name: Helena L. Crowell 
+    orcid: 0000-0002-4801-1767
+    affiliation: 7
+  - name: Francesca Drummer 
+    orcid: 0009-0002-7156-9125
+    affiliation: 8
+  - name: Hugo Gruson 
+    orcid: 0000-0002-4094-1476
+    affiliation: 3
+  - name: Max Hess 
+    orcid: 0000-0001-9528-4445
+    affiliation: 9
+  - name: Taobo Hu
+    orcid: 0000-0001-5124-7167
+    affiliation: 10
+  - name: Katarzyna Kedziora
+    orcid: 0000-0001-6524-7731
+    affiliation: 11,12
+  - name: Aaron Kollotzek
+    orcid: 0009-0009-7142-4015
+    affiliation: 1
+  - name: Silvia Maria Macrí 
+    orcid: 
+    affiliation: 13,14
+  - name: Eric Moerth 
+    orcid: 0000-0003-1625-0146
+    affiliation: 15
+  - name: Samir Moustafa 
+    orcid: 0000-0002-0674-9667
+    affiliation: 16,17
+  - name: Selman Ozleyen
+    orcid: 0009-0009-2596-7588
+    affiliation: 8
+  - name: Peter Todd 
+    orcid: 
+    affiliation: 18
+  - name: Ahmet Sarigün
+    orcid: 
+    affiliation: 1
   - name: Sonja Stockhaus
     orcid: 0009-0005-7712-8154
-    affiliation: 7
-  - name: Benjamin Rombaut
-    orcid: 0000-0002-4022-715X
-    affiliation: 8, 9, 10
-  - name: Louise Deconinck
-    orcid: 0000-0001-8100-6823
-    affiliation: 8, 9, 10
-  - name: Chiara Schiller
-    orcid: 0009-0000-3771-2202
-    affiliation: 11
-  - name: Yixing E. Dong
-    orcid: 0009-0003-5115-5686
-    affiliation: 12
-  - name: Vincent J. Carey
-    orcid: 0000-0003-4046-0063
-    affiliation: 13, 4
-  - name: Helena L. Crowell
-    orcid: 0000-0002-4801-1767
-    affiliation: 14
-  - name: Dario Righelli
-    orcid: 0000-0003-1504-3583
-    affiliation: 15
-  - name: Artür Manukyan
-    orcid: 0000-0002-0441-9517
-    affiliation: 21
-  - name: Wouter-Michiel Vierdag
+    affiliation: 19
+  - name: Marco Varrone 
+    orcid: 0000-0002-0538-3464
+    affiliation: 20
+  - name: Wouter Michiel Vierdag 
     orcid: 0000-0003-1666-5421
-    affiliation: 1, 16
-  - name: Miguel A. Ibarra-Arellano
-    orcid: 0000-0001-8411-4854
-    affiliation: 11
-  - name: Lotte Pollaris
-    orcid: 0000-0002-9509-9386
-    affiliation: 8, 9, 10
-  - name: Quentin Blampey
-    orcid: 0000-0002-3836-2889
-    affiliation: 17, 18
-  - name: Clarence Mah
-    orcid: 0000-0001-9926-5209
-    affiliation: 19, 20
-  - name: Laurens Lehner
-    orcid: 0000-0001-7690-7168
-    affiliation: 7
-
+    affiliation: 3
+  - name: Luke Zappia 
+    orcid: 0000-0001-7744-8565
+    affiliation: 21
+  - name: Yimin Zheng
+    orcid: 
+    affiliation: 16
+  - name: Oliver Stegle
+    orcid: 0000-0002-8818-7193
+    affiliation: 2,3
+  - name: Altuna Akalin
+    orcid: 0000-0002-0468-0117
+    affiliation: 1
 affiliations:
   - name: Max Delbrück Center for Molecular Medicine, Berlin Institute for Molecular Systems Biology (MDC-BIMSB)
     index: 1
