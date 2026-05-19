@@ -1,5 +1,5 @@
 ---
-title: "2nd SpatialData Hackathon: Frameworks, Formats and Interoperability
+title: "2nd SpatialData Hackathon: Frameworks, Formats and Interoperability"
 title_short: "2nd SpatialData Hackathon"
 tags:
   - spatial omics
@@ -17,7 +17,7 @@ authors:
     orcid: 0000-0003-2536-2545
     affiliation: 4
   - name: Chris Barnes
-    orcid: 
+    orcid: 0000-0002-1296-7310
     affiliation: 5
   - name: Alexander Blume 
     orcid: 0000-0003-3045-8234
@@ -47,7 +47,7 @@ authors:
     orcid: 0009-0009-7142-4015
     affiliation: 1
   - name: Silvia Maria Macrí 
-    orcid: 
+    orcid: 0009-0009-2075-8699
     affiliation: 13,14
   - name: Eric Moerth 
     orcid: 0000-0003-1625-0146
@@ -59,10 +59,8 @@ authors:
     orcid: 0009-0009-2596-7588
     affiliation: 8
   - name: Peter Todd 
-    orcid: 
     affiliation: 18
   - name: Ahmet Sarigün
-    orcid: 
     affiliation: 1
   - name: Sonja Stockhaus
     orcid: 0009-0005-7712-8154
@@ -77,7 +75,6 @@ authors:
     orcid: 0000-0001-7744-8565
     affiliation: 21
   - name: Yimin Zheng
-    orcid: 
     affiliation: 16
   - name: Oliver Stegle
     orcid: 0000-0002-8818-7193
@@ -137,10 +134,10 @@ biohackathon_url: "https://docs.google.com/document/d/1GC3GlajLtQsn1GJULbabflwol
 biohackathon_location: "Padua, Italy, 2026"
 group: Code repository
 # URL to project git repo --- should contain the actual paper.md:
-git_url: https://github.com/scverse/2026_04_hackathon_padua
+git_url: https://github.com/scverse/2026_04_hackathon_padua/tree/main/BioHackArxiv
 # This is the short authors description that is used at the
 # bottom of the generated paper (typically the first two authors):
-authors_short: 2nd SpatialData Hackathon participants
+authors_short: Manukyan, Marconato \emph{et al.}
 ---
 
 <!-- Note that you can use https://sparontologies.github.io/cito/current/cito.html#objectproperties
