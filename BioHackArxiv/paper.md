@@ -17,7 +17,7 @@ authors:
     orcid: 0000-0003-2536-2545
     affiliation: 4
   - name: Chris Barnes
-    orcid: 
+    orcid: 0000-0002-1296-7310
     affiliation: 5
   - name: Alexander Blume 
     orcid: 0000-0003-3045-8234
@@ -47,7 +47,7 @@ authors:
     orcid: 0009-0009-7142-4015
     affiliation: 1
   - name: Silvia Maria Macrí 
-    orcid: 
+    orcid: 0009-0009-2075-8699
     affiliation: 13,14
   - name: Eric Moerth 
     orcid: 0000-0003-1625-0146
@@ -62,7 +62,7 @@ authors:
     orcid: 
     affiliation: 18
   - name: Ahmet Sarigün
-    orcid: 
+    orcid: 0009-0003-2715-5344
     affiliation: 1
   - name: Sonja Stockhaus
     orcid: 0009-0005-7712-8154
@@ -77,7 +77,7 @@ authors:
     orcid: 0000-0001-7744-8565
     affiliation: 21
   - name: Yimin Zheng
-    orcid: 
+    orcid: 0000-0002-0394-9735
     affiliation: 16
   - name: Oliver Stegle
     orcid: 0000-0002-8818-7193
