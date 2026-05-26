@@ -125,7 +125,7 @@ affiliations:
     index: 19
   - name: Department of Computational Biology, University of Lausanne, Lausanne, Switzerland
     index: 20
-  - name: Data Intuitive BV, Korte Breestraat 4a, 9280 Lebbeke, Belgium, BE 0833.160.219
+  - name: Data Intuitive BV, Belgium
     index: 21
 
 date: 14 April 2026
