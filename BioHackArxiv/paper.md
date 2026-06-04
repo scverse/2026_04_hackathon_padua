@@ -51,44 +51,37 @@ authors:
     orcid: 0000-0001-5124-7167
     affiliation: 10
     role: Design modernization
-  - name: Katarzyna Kedziora
-    orcid: 0000-0001-6524-7731
-    affiliation: 11,12
-    role: Visualization tools
   - name: Aaron Kollotzek
     orcid: 0009-0009-7142-4015
     affiliation: 1
     role: R-interoperability
   - name: Silvia Maria Macrí 
     orcid: 0009-0009-2075-8699
-    affiliation: 13,14
+    affiliation: 11,12
     role: File formats and transformations
   - name: Eric Moerth 
     orcid: 0000-0003-1625-0146
-    affiliation: 15
+    affiliation: 13
     role: Visualization tools
   - name: Samir Moustafa 
     orcid: 0000-0002-0674-9667
-    affiliation: 16,17
+    affiliation: 14,15
     role: Design modernization
   - name: Selman Ozleyen
     orcid: 0009-0009-2596-7588
     affiliation: 8
     role: Design modernization
-  - name: Peter Todd 
-    affiliation: 18
-    role: Visualization tools
   - name: Ahmet Sarigün
     orcid: 0009-0003-2715-5344
     affiliation: 1
     role: Visualization tools
   - name: Sonja Stockhaus
     orcid: 0009-0005-7712-8154
-    affiliation: 19
+    affiliation: 16
     role: Visualization tools
   - name: Marco Varrone 
     orcid: 0000-0002-0538-3464
-    affiliation: 20
+    affiliation: 17
     role: Visualization tools
   - name: Wouter Michiel Vierdag 
     orcid: 0000-0003-1666-5421
@@ -96,11 +89,11 @@ authors:
     role: File formats and transformations
   - name: Luke Zappia 
     orcid: 0000-0001-7744-8565
-    affiliation: 21
+    affiliation: 18
     role: R-interoperability
   - name: Yimin Zheng
     orcid: 0000-0002-0394-9735
-    affiliation: 16
+    affiliation: 14
     role: Design modernization
   - name: Oliver Stegle
     orcid: 0000-0002-8818-7193
@@ -131,28 +124,22 @@ affiliations:
     index: 9
   - name: Science for Life Laboratory, Department of Biochemistry and Biophysics, Stockholm University, Stockholm, Sweden
     index: 10
-  - name: Pittsburgh Supercomputing Center
-    index: 11
-  - name: Carnegie Mellon University
-    index: 12
   - name: Italian Institute of Technology
-    index: 13
+    index: 11
   - name: University of Bologna
-    index: 14
+    index: 12
   - name: HIDIVE Lab, Department of Biomedical Informatics, Harvard Medical School (HMS)
-    index: 15
+    index: 13
   - name: CeMM Research Center for Molecular Medicine of the Austrian Academy of Sciences
-    index: 16
+    index: 14
   - name: Faculty of Computer Science, University of Vienna
-    index: 17
-  - name: Centre for Human Genetics, University of Oxford
-    index: 18
+    index: 15
   - name: Computational Mass Spectrometry, TUM School of Life Sciences, Technical University of Munich
-    index: 19
+    index: 16
   - name: Department of Computational Biology, University of Lausanne, Lausanne, Switzerland
-    index: 20
+    index: 17
   - name: Data Intuitive BV, Belgium
-    index: 21
+    index: 18
 
 date: 14 April 2026
 cito-bibliography: paper.bib
@@ -173,12 +160,12 @@ for more detailed citations for text mining e.g. [@uses_method_in:marconato_spat
 
 # Abstract
 
-This preprint outlines the results of the "2nd SpatialData Hackathon" organized by the SpatialData team and funded by ScienceServe Project Call of Helmholtz Association. The event gathered experts to advance spatial omics through four hackathon tracks: (i) R interoperability, (ii) accessibility and performance of visualization tools, (iii) design modernization for the SpatialData framework, and (iv) file formats and transformations (NGFF).
+This preprint outlines the results of the "2nd SpatialData Hackathon" organised by the scverse and Bioconductor teams. The event gathered experts to advance spatial omics through four hackathon tracks: (i) R interoperability, (ii) accessibility and performance of visualization tools, (iii) design modernization for the SpatialData framework, and (iv) file formats and transformations (NGFF).
 Key achievements include extending the SpatialData, Zarr and bioimaging frameworks to R/Bioconductor ecosystem, improving visualization with 2.5D/3D rendering and a chunked multiscale point representation, introducing cloud-based IO and prototypes for lazy file linking and bidirectional element-table relationships, and developing a language-agnostic conformance test suite for OME-NGFF coordinate transformations. The hackathon fostered collaboration, creating infrastructure prototypes and identifying interoperability challenges. Documented on GitHub, these efforts brought together 24 participants from the US and Europe, promoting a FAIR ecosystem of spatial omics and imaging tools.
 
 # Introduction
 
-The "2nd SpatialData Hackathon" was an in-person event organized by the scverse SpatialData and Bioconductor teams, and funded by the Helmholtz Association (ScienceServe Project Call) that brought together expertise from different fields, including methods developers of a variety of tools for bioimaging, single-cell and spatial omics. The purpose is to explore new directions to advance the field of spatial omics [@Marconato2024-ya]. By leveraging multiple programming languages, including Python, R, and JavaScript, the event focuses on four central hackathon tracks:
+The "2nd SpatialData Hackathon" was an in-person event organized by the scverse SpatialData and Bioconductor teams, and funded by the Helmholtz Association (ScienceServe Project Call) that brought together expertise from different fields, including methods developers of a variety of tools for bioimaging, single-cell and spatial omics. The purpose was to explore new directions to advance the field of spatial omics [@Marconato2024-ya]. By leveraging multiple programming languages, including Python, R, and JavaScript, the event focused on four central hackathon tracks:
 
 * R interoperability
 * Accessibility, maintainability and performance of visualization tools
@@ -192,7 +179,7 @@ Key achievements include:
 * *Design modernization for the SpatialData framework*: Cloud-based input/output (IO) was introduced, enabling direct read/write against remote object stores via fsspec. Prototypes were developed for lazy external file linking, bidirectional element-table relationships, and contour-aware spatial density profiling.
 * *File formats and transformations (NGFF)*: A language-agnostic conformance test suite for OME-NGFF Request for Comments 5 (RFC-5) coordinate transformations was developed, alongside extensions to the `transformnd` library covering most RFC-5 transformations across multiple array backends. A prototype integration with `multiview-stitcher` enables tile stitching and fusion directly within SpatialData workflows.
 
-The hackathon fostered collaboration, creating infrastructure prototypes and identifying interoperability challenges. Documented on GitHub, these efforts brought together 24 participants from USA and Europe, promoting a Findable, Accessible, Interoperable and Reusable (FAIR) ecosystem of spatial omics and imaging tools.
+The hackathon fostered collaboration, creating infrastructure prototypes and identifying interoperability challenges. Documented on GitHub, these efforts brought together 24 participants from the United States and Europe, promoting a Findable, Accessible, Interoperable and Reusable (FAIR) ecosystem of spatial omics and imaging tools.
 
 # Results
 
@@ -202,21 +189,21 @@ All the issues were tracked in a public project board accessible here: [https://
 
 This track introduced numerous utilities to the existing Bioconductor packages to interface with SpatialData objects on disk. These packages are mainly designed to serve as dependencies for the spatialdataR package, an R wrapper of the SpatialData framework [@Marconato2024-ya], that will be submitted to Bioconductor soon.
 
-![Comparison of Zarr, bioimaging and single-cell/spatial omics packages across scverse and Bioconductor ecosystems that interface with SpatialData objects on disk. *"Database-icon" by Zahra Ibrahem is licensed under CC BY-SA 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-sa/4.0/?ref=openverse.*](figs/r-interop.png)
+![Comparison of Zarr, bioimaging and single-cell/spatial omics packages across scverse and Bioconductor ecosystems that interface with SpatialData objects on disk (*"Database-icon" by Zahra Ibrahem is licensed under CC BY-SA 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-sa/4.0/?ref=openverse.)*](figs/r-interop.png)
 
-**spatialdataR** \[[HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR)\]: The R package now supports Zarr v3 handling and includes improved show-method of SpatialData Zarr attributes; added various methods to streamline internal operations (e.g., accession of links between layers); added general utilities (e.g., spatial extent, retrieving centroids of elements). A first draft of coordinate space transformations is now complete (with the exception of affine transformations), including scale, rotation, translation, sequence, etc. The package now also supports table-based queries (e.g., using observation metadata), spatial queries (polygonal, bounding box), aggregation of information between layers (e.g., masking points by shapes to obtain a table), etc. Finally, a draft pull request provides write utilities for spatial elements of images, labels, points and shapes in both Zarr v2 and v3, including roundtrip tests for conformance with [scverse/spatialdata](https://github.com/scverse/spatialdata) \[[\#163](https://github.com/HelenaLC/spatialdataR/pull/163)\].
+**spatialdataR** \[[HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR)\]: The R package now supports Zarr v3 handling and includes improved show-method of SpatialData Zarr attributes; added various methods to streamline internal operations (e.g., accessing links between layers); added general utilities (e.g., spatial extent, retrieving centroids of elements). A first draft of coordinate space transformations is now complete (with the exception of affine transformations), including scale, rotation, translation, sequence, etc. The package now also supports table-based queries (e.g., using observation metadata), spatial queries (polygonal, bounding box), aggregation of information between layers (e.g., masking points by shapes to obtain a table), etc. Finally, a draft pull request provides write utilities for spatial elements of images, labels, points and shapes in both Zarr v2 and v3, including roundtrip tests for conformance with [scverse/spatialdata](https://github.com/scverse/spatialdata) \[[\#163](https://github.com/HelenaLC/spatialdataR/pull/163)\].
 
-**dummy-spatialdata** \[[BIMSBbioinfo/dummy-spatialdata](https://github.com/BIMSBbioinfo/dummy-spatialdata)\]: Python package (also available on PyPI) to generate artificial SpatialData Zarr stores for code development, unit testing, documentation, etc. The python package is well-integrated with the SpatialData.data R package to generate example SpatialData Zarr datasets using reticulate and basilisk packages.
+**dummy-spatialdata** \[[BIMSBbioinfo/dummy-spatialdata](https://github.com/BIMSBbioinfo/dummy-spatialdata)\]: Python package (also available on PyPI) to generate artificial SpatialData Zarr stores for code development, unit testing, documentation, etc. The Python package is well-integrated with the SpatialData.data R package to generate example SpatialData Zarr datasets using reticulate and basilisk packages.
 
 **romeo** \[[Huber-group-EMBL/romeo](https://github.com/Huber-group-EMBL/romeo)\]: Creation of a new package, based on the [Rarr](https://www.bioconductor.org/packages/release/bioc/html/Rarr.html) and [ZarrArray](https://bioconductor.org/packages/devel/bioc/html/ZarrArray.html) packages, to work with OME-Zarr [@Moore2023-ix] data multiscale images in R. The package can validate OME-Zarr data through JSON schema validation, and read the multiscale as a list of arrays. A custom class, `ome_zarr`, and custom methods (subset, plot, etc.) allow convenient manipulation of the list of arrays as if it were a standard, single scale, array.
 
-![**a)** Left: SpatialData object representation in R. Middle: Spatial plot of cell centroids from Xenium breast cancer tissue section [@Janesick2023-fx] colored by cell type assignment; black = bounding box query. Right: Image cropped to bounding box, including transcripts falling within another bounding box query, colored by in nucleus (pink) or not (hidden). The full-resolution image is ~25x35k pixels, and there are ~42M molecules; the visualization takes about 3 seconds, realizing only a small low-resolution array and a few thousand points into memory. **b)** Schematic of the anndataR roundtrip testing approach. An AnnData creating a specific element to test is generated in Python and saved to disk. This file is then re-read in R and saved to a new file. In the final step, the R output is read by Python and compared to the Python output. The reverse process where data is generated in R is also tested. **c)** Output of the `plot.ome_zarr()` method in the romeo R package. The top image applied a Z-stack operation to merge all channels and the bottom image shows all channels within separate panels. Image from a Breast cancer imaging mass cytometry (IMC) dataset [@Ali2020-hg].](figs/1.png)
+![**a)** Left: SpatialData object representation in R. Middle: Spatial plot of cell centroids from Xenium breast cancer tissue section [@Janesick2023-fx] colored by cell type assignment; black = bounding box query. Right: Image cropped to bounding box, including transcripts falling within another bounding box query, colored by in nucleus (pink) or not (hidden). The full-resolution image is ~25x35k pixels, and there are ~42M molecules; the visualization takes about 3 seconds, realizing only a small low-resolution array and a few thousand points into memory. **b)** Schematic of the anndataR roundtrip testing approach. An AnnData object containing a specific element for testing is generated in Python and saved to disk. This file is then re-read in R and saved to a new file. In the final step, the R output is read by Python and compared to the Python output. The reverse process where data is generated in R is also tested. **c)** Output of the `plot.ome_zarr()` method in the romeo R package. The top image applied a Z-stack operation to merge all channels and the bottom image shows all channels within separate panels. Image from a Breast cancer imaging mass cytometry (IMC) dataset [@Ali2020-hg].](figs/1.png)
 
 **ImageArray** \[[BIMSBbioinfo/ImageArray](https://github.com/BIMSBbioinfo/ImageArray)\]: Extraction of the ImageArray class introduced in the 1st SpatialData Hackathon [@Marconato2024-bh] into a separate package, providing a file-agnostic abstraction layer with support for HDF5, Zarr, OME-TIFF or Bio-Formats [@Linkert2010-mz] based images. Extension of the core dimensions supported in the package to BioFormats/OME-NGFF [@Moore2021-lk] core dimensions (XYZCT). This is done by extracting dimensions from the associated metadata and propagating them to the internal axis metadata of the ImageArray objects \[[\#43](https://github.com/BIMSBbioinfo/ImageArray/pull/43)\]. Introduction of a generic approach for conversion from OME-Zarr to ImageArray via the romeo package \[[\#41](https://github.com/BIMSBbioinfo/ImageArray/pull/41)\].
 
-**SpatialData.validate** \[[SpatialData.validate](https://huber-group-embl.github.io/SpatialData.validate/)\]: Multiscale images in SpatialData use hybrid OME-NGFF like metadata to specify transformations. It is mostly based on OME-NGFF v0.5, but already integrates elements from the unreleased OME-NGFF v0.6. It strictly matches neither of the OME-NGFF versions, and is marked as version: "0.5-dev-spatialdata". We wrote and published a schema for this intermediate hybrid version. This will serve to improve interoperability between different implementations of SpatialData ([scverse/spatialdata](https://github.com/scverse/spatialdata), [HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR), [Taylor-CCB-Group/SpatialData.js](https://github.com/Taylor-CCB-Group/SpatialData.js)).
+**SpatialData.validate** \[[SpatialData.validate](https://huber-group-embl.github.io/SpatialData.validate/)\]: Multiscale images in SpatialData use hybrid OME-NGFF-like metadata to specify transformations. It is mostly based on OME-NGFF v0.5, but already integrates elements from the unreleased OME-NGFF v0.6. It strictly matches neither of the OME-NGFF versions, and is marked as version: "0.5-dev-spatialdata". We wrote and published a schema for this intermediate hybrid version. This will serve to improve interoperability between different implementations of SpatialData ([scverse/spatialdata](https://github.com/scverse/spatialdata), [HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR), [Taylor-CCB-Group/SpatialData.js](https://github.com/Taylor-CCB-Group/SpatialData.js)).
 
-**anndataR** \[[scverse/anndataR](https://github.com/scverse/anndataR)\]: Finalize implementation of Zarr support in the R/Bioconductor [anndataR](https://bioconductor.org/packages//release/bioc/html/anndataR.html) package [@Deconinck2025-gx]. This package provides a native R implementation of the Python AnnData ([https://pypi.org/project/anndata/](https://pypi.org/project/anndata/)) object focusing on reading and writing HDF5-based H5AD files and conversion to common R objects for single-cell RNA sequencing (RNA-seq). Adding Zarr support is required to remove the need for Python dependencies in the R SpatialData package ([HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR)). This work brings together contributions from several members of the community and is validated by a comprehensive suite of round trip tests to ensure consistency with the Python implementation \[[\#190](https://github.com/scverse/anndataR/pull/190)\].
+**anndataR** \[[scverse/anndataR](https://github.com/scverse/anndataR)\]: Finalized implementation of Zarr support in the R/Bioconductor [anndataR](https://bioconductor.org/packages//release/bioc/html/anndataR.html) package [@Deconinck2025-gx]. This package provides a native R implementation of the Python AnnData ([https://pypi.org/project/anndata/](https://pypi.org/project/anndata/)) object focusing on reading and writing HDF5-based H5AD files and conversion to common R objects for single-cell RNA sequencing (RNA-seq). Adding Zarr support is required to remove the need for Python dependencies in the R SpatialData package ([HelenaLC/spatialdataR](https://github.com/HelenaLC/spatialdataR)). This work brings together contributions from several members of the community and is validated by a comprehensive suite of round trip tests to ensure consistency with the Python implementation \[[\#190](https://github.com/scverse/anndataR/pull/190)\].
 
 ## Accessibility, maintainability and performance of visualization tools
 
@@ -266,7 +253,7 @@ We evaluated the approaches on 10k and 10M points that are annotated randomly wi
 
 **Advancement of [Taylor-CCB-Group/SpatialData.js](https://github.com/Taylor-CCB-Group/SpatialData.js)**:
 
-1. **Labels** initial layer support \[[\#22](https://github.com/Taylor-CCB-Group/SpatialData.js/pull/22)\] with interactive picking associated with element ID; the intention is that there should be well-typed high-level interfaces for event-binding, filtering and mapping visualization parameters with associated annotating tables. As such, presentation of a visible tool-tip with associated ID is an initial verification of the validity of the implementation so far.
+1. **Labels** - initial layer support \[[\#22](https://github.com/Taylor-CCB-Group/SpatialData.js/pull/22)\] with interactive picking associated with element ID; the intention is that there should be well-typed high-level interfaces for event-binding, filtering and mapping visualization parameters with associated annotating tables. As such, presentation of a visible tool-tip with associated ID is an initial verification of the validity of the implementation so far.
 
 ![SpatialData.js labels layer with interactive element picking and tooltip display, using Xenium Human Pancreas dataset [@xenium_human_pancreas].](figs/5.png)
 
@@ -282,7 +269,7 @@ We evaluated the approaches on 10k and 10M points that are annotated randomly wi
 
 ![Overview of the cloud-based IO architecture for SpatialData, supporting remote object stores via UPath and fsspec.](figs/6.png)
 
-**Exploration of prototypes for the definition of link representation between spatial elements and tables** - Currently, SpatialData uses region\_key and instance\_key to keep track of which table is annotating which elements, but this is unidirectional, and iteration through every table must be done to keep track of all linkage relationships. The proposed solution should achieve two purposes: (i) users can easily track all relationships within SpatialData, and (ii) users are allowed to use one table to annotate multiple spatial elements, now with the abiility of using the same table row to annotate instances in multiple spatial elements.
+**Exploration of prototypes for the definition of link representation between spatial elements and tables** - Currently, SpatialData uses region\_key and instance\_key to keep track of which table is annotating which elements, but this is unidirectional, and iteration through every table must be done to keep track of all linkage relationships. The proposed solution should achieve two purposes: (i) users can easily track all relationships within SpatialData, and (ii) users are allowed to use one table to annotate multiple spatial elements, now with the ability to use the same table row to annotate instances in multiple spatial elements.
 
 Prototype 1 (\#6): For elements or tables that need to be linked, they will need to be indexed by adding an extra column. This can be done by `index_element(sdata, "cell_shapes")`, and then links can be created between spatial element and table with an API that mimics pd.merge and gpd.sjoin: `annotate_by_table(sdata, "cell_shapes", "cell_table", method="sjoin")`. The joining operation will not be evaluated eagerly; the operations and the links will be recorded in `attrs` of SpatialData. This can then be digested by `get_element_mapping(sdata, "cell_shapes", "cell_table")`. See discussion in this issue \[[\#6](https://github.com/scverse/2026_04_hackathon_padua/issues/6)\].
 
@@ -290,11 +277,11 @@ Prototype 1 (\#6): For elements or tables that need to be linked, they will need
 
 Prototype 2: We experimented with DuckDB [@RaasveldtUnknown-mj] to represent cross-element relationships and query the data. We concluded that a representation of relationships, as outlined in the first prototype, remains essential. From this, an on-the-fly DuckDB representation could be created, which could then be used for creating custom views and querying the data in a Structured Query Language (SQL) manner.
 
-**Exploration of prototypes for a "simple" SpatialData object** - We discussed the scope of "simple" to cover common use cases in spatial biology research. We proposed that there could be an abstraction where a SpatialData object fulfilling some requirements (which can be evaluated on-the-fly) would be considered a "simple" SpatialData object. These could be having only one image, one points element, one shape table, and one AnnData table. All elements should be registered under the same coordinate system, and the size of spatial elements should match the size of the AnnData table. The simple SpatialData can be concatenated, but the operation will be evaluated lazily.
+**Exploration of prototypes for a "simple" SpatialData object** - We discussed the scope of "simple" to cover common use cases in spatial biology research. We proposed that there could be an abstraction where a SpatialData object fulfilling some requirements (which can be evaluated on-the-fly) would be considered a "simple" SpatialData object. These requirements could include having only one image, one points element, one shape table, and one AnnData table. All elements should be registered under the same coordinate system, and the size of spatial elements should match the size of the AnnData table. The simple SpatialData can be concatenated, but the operation will be evaluated lazily.
 
 **Exploration of prototypes for HierarchicalSpatialData** - OME-Zarr [@Moore2023-ix] stores, in principle, can represent arbitrarily nested objects, but this is not supported by SpatialData, which restricts the store to a two-level hierarchy. We discussed the implications of relaxing these constraints, structuring the design discussion on top of an experiment developed during the scverse proteomics hackathon (Berlin, 2026) ([https://github.com/scverse/2026_03_hackathon_proteomics](https://github.com/scverse/2026_03_hackathon_proteomics)). Supporting hierarchical objects would simplify the data collection process (as SpatialData objects would be created individually) while allowing them to be treated as a common parent object. Metadata such as coordinate transformations and table-element linking would be situated at different levels: sample-level metadata would remain in the child objects, while cross-sample/global metadata would be stored higher in the hierarchy. Consequently, a more general/centralized and discoverable support for metadata would be necessary (as discussed in the other prototype). The new hierarchical design pairs well with the "simple" SpatialData concept, making it easy to create simple datasets and then bundle them into a global collection for joint exploration.
 
-**Exploration of prototypes for soft-linking external files within SpatialData** - The current usage pattern in SpatialData is: read raw data → write to Zarr → re-read. Supporting lazy representations of raw data (CSV, OME-TIFF, or proprietary formats, etc.) would improve ergonomics at a potential performance cost.
+**Exploration of prototypes for soft-linking external files within SpatialData** - The current usage pattern in SpatialData is: read raw data → write to Zarr → re-read. Supporting lazy representations of raw data (CSV, OME-TIFF, proprietary formats, etc.) would improve ergonomics at a potential performance cost.
 
 Prototype 1 \[[\#12](https://github.com/scverse/2026_04_hackathon_padua/issues/12)\]: A new class of LazyContainer that only stores the location of external files (local or remote) will be added. This will only be serialized to JSON format. Once SpatialData gets initialized, it will mount the LazyContainers to SpatialData without materializing them. The data will only be parsed when the user accesses it explicitly, and the actual data will be returned instead of the LazyContainer. When serializing the SpatialData on the disk again, the LazyContainer remains lazy. The materialized data will not be flushed onto the disk.
 
@@ -312,19 +299,19 @@ As a local prototype, we implemented two candidate analysis interfaces in a Squi
 
 We anticipate a number of implementations of these transformations and the metadata structures which represent them, across different programming languages and tools. As such, we developed a core set of conformance tests ([clbarnes/ome\_zarr\_transformations\_conformance](https://github.com/clbarnes/ome_zarr_transformations_conformance)) to enable tool developers to validate that their implementations were capable of reading standardized metadata and transforming coordinates as the metadata describes.
 
-The repository describes the API of a simple command line interface which can be implemented by tool developers to read transformation metadata and apply it to given coordinates. It also provides a tool which uses this CLI to run a set of tests covering capabilities expected of OME-Zarr implementations (Figure 9).
+The repository describes the API of a simple command line interface which can be implemented by tool developers to read transformation metadata and apply it to given coordinates. It also provides a tool which uses this CLI to run a set of tests covering capabilities expected of OME-Zarr implementations (Figure \ref{omezarr-figure}).
 
-![**a)** OME-Zarr test cases for each transformation stored in ome\_zarr\_transformations\_conformance. **b)** Transformations from an OME-Zarr implementation tested on given coordinates.](figs/9.png)
+![**a)** OME-Zarr test cases for each transformation stored in ome\_zarr\_transformations\_conformance. **b)** Transformations from an OME-Zarr implementation tested on given coordinates. \label{omezarr-figure}](figs/9.png)
 
 **`transformnd` is a generic library abstracting over coordinate transformations** - The addition of transforms (RFC-5) represents a significant complication of the specification, potentially affecting many implementations such as viewers or IO libraries that need to handle them appropriately. Many currently implement and maintain only a subset of those transforms. As new transforms are added, the burden on implementations grows — which is why we worked on transformnd, a Python library which could be extended to implement all RFC-5 transforms. We modernized the repository \[[\#5](https://github.com/clbarnes/transformnd/issues/5)\], updated the documentation and tutorial \[[\#22](https://github.com/clbarnes/transformnd/pull/22)\], added new transforms (mapAxis \[[\#12](https://github.com/clbarnes/transformnd/issues/12)\], byDimension \[[\#15](https://github.com/clbarnes/transformnd/issues/15)\], bijection \[[\#16](https://github.com/clbarnes/transformnd/issues/16)\]), and added new functionality for simplifying a sequence of linear transforms into a single affine transformation \[[\#8](https://github.com/clbarnes/transformnd/issues/8)\]. The library is a work in progress. Implemented transforms are tracked in issue [\#4](https://github.com/clbarnes/transformnd/issues/4).
 
 **Exploring stitching of spatial-omics datasets** - One concrete use case of using transformations in SpatialData consists in storing tiled spatial-omics acquisitions as separate image elements positioned in a common stage or sample space. That representation is flexible and faithful to acquisition, but many practical tasks benefit from a single fused raster: large-scale visualization becomes simpler, and downstream analyses such as segmentation often work more naturally on one image than on many adjacent or overlapping tiles. Therefore tile stitching can be an important capability to explore for SpatialData-based workflows.
 
-The python package *multiview-stitcher* [@Albert2026-pr] \[[multiview-stitcher/multiview-stitcher](https://github.com/multiview-stitcher/multiview-stitcher)\] is a strong match for this problem because it is a Python-native toolbox built for registering and fusing tiled 2D and 3D image datasets, while integrating directly with the same ecosystem SpatialData already uses, including [xarray](https://pypi.org/project/xarray/), [spatial-image/spatial-image](https://github.com/spatial-image/spatial-image), [spatial-image/multiscale-spatial-image](https://github.com/spatial-image/spatial-image). It also scales with dask and supports both registration and fusion, so it can use existing tile-placement metadata when available and refine tile positions when needed. That makes it a natural backend for SpatialData rather than a separate export-only workflow.
+The Python package *multiview-stitcher* [@Albert2026-pr] \[[multiview-stitcher/multiview-stitcher](https://github.com/multiview-stitcher/multiview-stitcher)\] is a strong match for this problem because it is a Python-native toolbox built for registering and fusing tiled 2D and 3D image datasets, while integrating directly with the same ecosystem SpatialData already uses, including [xarray](https://pypi.org/project/xarray/), [spatial-image/spatial-image](https://github.com/spatial-image/spatial-image), [spatial-image/multiscale-spatial-image](https://github.com/spatial-image/spatial-image). It also scales with dask and supports both registration and fusion, so it can use existing tile-placement metadata when available and refine tile positions when needed. That makes it a natural backend for SpatialData rather than a separate export-only workflow.
 
-During the hackathon we created a notebook \[[demo](https://github.com/scverse/2026_04_hackathon_padua/blob/main/transformations/fuse_sdata_images.ipynb)\] \[[\#29](https://github.com/scverse/2026_04_hackathon_padua/issues/29)\] that prototypes a bridge between the two libraries: each SpatialData image element is converted into a multiview-stitcher SpatialImage by extracting its affine transform to a chosen coordinate system and passing that transform under a transform\_key to multiview-stitcher. The images are then fused with fusion.fuse, and the result is converted back into a new SpatialData image element whose spacing and origin are re-encoded as SpatialData transformations (Figure 10). The demo uses a subset of a CosMx example dataset [@noauthor_2023-vy] (which can be converted to the SpatialData Zarr format via [scverse/spatialdata-io](https://github.com/scverse/spatialdata-io)) and shows that fusion can already be expressed as a SpatialData-to-SpatialData operation. It further proposes a high level stitching API for `fuse_sdata_images` which includes the option to refine alignment before fusion, as well as the option to directly fuse into different spatial resolutions. While full multiscale support is not fully implemented in the resulting function yet, implementation suggestions have been added.
+During the hackathon we created a notebook \[[demo](https://github.com/scverse/2026_04_hackathon_padua/blob/main/transformations/fuse_sdata_images.ipynb)\] \[[\#29](https://github.com/scverse/2026_04_hackathon_padua/issues/29)\] that prototypes a bridge between the two libraries: each SpatialData image element is converted into a multiview-stitcher SpatialImage by extracting its affine transform to a chosen coordinate system and passing that transform under a transform\_key to multiview-stitcher. The images are then fused with fusion.fuse, and the result is converted back into a new SpatialData image element whose spacing and origin are re-encoded as SpatialData transformations (Figure \ref{multis-figure}). The demo uses a subset of a CosMx example dataset [@noauthor_2023-vy] (which can be converted to the SpatialData Zarr format via [scverse/spatialdata-io](https://github.com/scverse/spatialdata-io)) and shows that fusion can already be expressed as a SpatialData-to-SpatialData operation. It further proposes a high-level stitching API for `fuse_sdata_images` which includes the option to refine alignment before fusion, as well as the option to directly fuse into different spatial resolutions. While full multiscale support is not yet implemented in the resulting function yet, implementation suggestions have been added.
 
-![**a)** Field of view images of CosMx datasets before stitching. **b)** Proposed `fuse_spatialdata_images` function fusing image elements that are backed by dask arrays or in memory. **c)** napari view of the stitched image elements. The demo uses a subset of a CosMx example dataset [@noauthor_2023-vy].](figs/10.png)
+![**a)** Field of view images of CosMx datasets before stitching. **b)** Proposed `fuse_spatialdata_images` function fusing image elements that are backed by dask arrays or in memory. **c)** napari view of the stitched image elements. The demo uses a subset of a CosMx example dataset [@noauthor_2023-vy]. \label{multis-figure}](figs/10.png)
 
 # Conclusions
 
@@ -332,6 +319,6 @@ The hackathon brought together 24 participants from institutions across the US a
 
 # Acknowledgements
 
-The event was made possible thanks to the support by ScienceServe Project Call of Helmholtz Association.
+The event was made possible thanks to the support from ScienceServe Project Call of the Helmholtz Association.
 
 # References
