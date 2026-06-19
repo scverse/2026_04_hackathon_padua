@@ -51,37 +51,44 @@ authors:
     orcid: 0000-0001-5124-7167
     affiliation: 10
     role: Design modernization
+  - name: Katarzyna Kedziora
+    orcid: 0000-0001-6524-7731
+    affiliation: 11,12
+    role: Visualization tools
   - name: Aaron Kollotzek
     orcid: 0009-0009-7142-4015
     affiliation: 1
     role: R-interoperability
   - name: Silvia Maria Macrí 
     orcid: 0009-0009-2075-8699
-    affiliation: 11,12
+    affiliation: 13,14
     role: File formats and transformations
   - name: Eric Moerth 
     orcid: 0000-0003-1625-0146
-    affiliation: 13
+    affiliation: 15
     role: Visualization tools
   - name: Samir Moustafa 
     orcid: 0000-0002-0674-9667
-    affiliation: 14,15
+    affiliation: 16,17
     role: Design modernization
   - name: Selman Ozleyen
     orcid: 0009-0009-2596-7588
     affiliation: 8
     role: Design modernization
+  - name: Peter Todd 
+    affiliation: 18
+    role: Visualization tools
   - name: Ahmet Sarigün
     orcid: 0009-0003-2715-5344
     affiliation: 1
     role: Visualization tools
   - name: Sonja Stockhaus
     orcid: 0009-0005-7712-8154
-    affiliation: 16
+    affiliation: 19
     role: Visualization tools
   - name: Marco Varrone 
     orcid: 0000-0002-0538-3464
-    affiliation: 17
+    affiliation: 20
     role: Visualization tools
   - name: Wouter Michiel Vierdag 
     orcid: 0000-0003-1666-5421
@@ -89,11 +96,11 @@ authors:
     role: File formats and transformations
   - name: Luke Zappia 
     orcid: 0000-0001-7744-8565
-    affiliation: 18
+    affiliation: 21
     role: R-interoperability
   - name: Yimin Zheng
     orcid: 0000-0002-0394-9735
-    affiliation: 14
+    affiliation: 16
     role: Design modernization
   - name: Oliver Stegle
     orcid: 0000-0002-8818-7193
@@ -124,22 +131,28 @@ affiliations:
     index: 9
   - name: Science for Life Laboratory, Department of Biochemistry and Biophysics, Stockholm University, Stockholm, Sweden
     index: 10
-  - name: Italian Institute of Technology
+  - name: Pittsburgh Supercomputing Center
     index: 11
-  - name: University of Bologna
+  - name: Carnegie Mellon University
     index: 12
-  - name: HIDIVE Lab, Department of Biomedical Informatics, Harvard Medical School (HMS)
+  - name: Italian Institute of Technology
     index: 13
-  - name: CeMM Research Center for Molecular Medicine of the Austrian Academy of Sciences
+  - name: University of Bologna
     index: 14
-  - name: Faculty of Computer Science, University of Vienna
+  - name: HIDIVE Lab, Department of Biomedical Informatics, Harvard Medical School (HMS)
     index: 15
-  - name: Computational Mass Spectrometry, TUM School of Life Sciences, Technical University of Munich
+  - name: CeMM Research Center for Molecular Medicine of the Austrian Academy of Sciences
     index: 16
-  - name: Department of Computational Biology, University of Lausanne, Lausanne, Switzerland
+  - name: Faculty of Computer Science, University of Vienna
     index: 17
-  - name: Data Intuitive BV, Belgium
+  - name: Centre for Human Genetics, University of Oxford
     index: 18
+  - name: Computational Mass Spectrometry, TUM School of Life Sciences, Technical University of Munich
+    index: 19
+  - name: Department of Computational Biology, University of Lausanne, Lausanne, Switzerland
+    index: 20
+  - name: Data Intuitive BV, Belgium
+    index: 21
 
 date: 14 April 2026
 cito-bibliography: paper.bib
